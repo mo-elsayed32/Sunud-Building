@@ -251,7 +251,7 @@ const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp
 const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
 const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const nm=k=>W[k][0],co=k=>W[k][1];
-let ntl=null,nrl=0,rto=0,c6=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
+let ntl=null,nrl=0,rto=0,c6=0,c7=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
@@ -298,7 +298,7 @@ async function pcall(a,x={}){
  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});return await r.json()}catch(e){return null}
 }
 function cmerge(j){
- const first=!cOK;cOK=true;if(j.v>=6)c6=1;cseen=j.seen||{};con=j.on||[];crecv=Date.now();
+ const first=!cOK;cOK=true;if(j.v>=6)c6=1;if(j.v>=7)c7=1;cseen=j.seen||{};con=j.on||[];crecv=Date.now();
  (j.del||[]).forEach(id=>{const i=msgs.findIndex(m=>m.id===id);if(i>=0){msgs.splice(i,1);cv++}});
  (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++}});
  msgs.sort((a,b)=>a.id-b.id);
@@ -343,9 +343,13 @@ function jm(id){const e=$('m'+id);if(e){e.scrollIntoView({block:'center'});e.cla
 const nts=()=>st&&Array.isArray(st.nt)?st.nt:null;
 const unN=()=>{const a=nts();return a?a.filter(n=>n.id>(st.nr||0)).length:0};
 function ntx(n){const t=`«${E(n.t)}»`;return n.k==='rq'?`${nm(n.f)} طلب ${t}`:n.k==='ok'?`اتقبل طلبك ${t}`:n.k==='no'?`اتفضّ طلبك ${t}`:n.k==='got'?`اتنقلت لك ${t}`:`${t} اتنقلت إلى ${nm(n.x)}`}
+const FCM=null,FV='REPLACE_AFTER_VERIFY';
+function pushOK(){return !!FCM&&c7&&'Notification' in window&&'serviceWorker' in navigator}
+function pushCard(){if(!pushOK())return'';const g=Notification.permission==='granted'&&localStorage.getItem('pt_'+me);return `<section class="card"><div class="t"><div class="n">${g?'التنبيهات شغالة':'تنبيهات على التليفون'}</div>${g?'':'<button class="p" onclick="pushOn()">تفعيل</button>'}</div></section>`}
+async function pushOn(){try{if(await Notification.requestPermission()!=='granted')return;const reg=await navigator.serviceWorker.ready;await new Promise((ok,no)=>{const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/'+FV+'/firebase-app-compat.js';a.onload=ok;a.onerror=no;document.head.appendChild(a)});await new Promise((ok,no)=>{const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/'+FV+'/firebase-messaging-compat.js';a.onload=ok;a.onerror=no;document.head.appendChild(a)});firebase.apps.length||firebase.initializeApp(FCM.cfg);const tok=await firebase.messaging().getToken({vapidKey:FCM.vapid,serviceWorkerRegistration:reg});if(tok){const r=await call('ftok',{tok});if(r&&r.ok){localStorage.setItem('pt_'+me,'1');draw()}}}catch(e){}}
 function notifs(){
  const a=nts()||[],r=st.nr||0;
- return `<section class="card"><h2>الإشعارات</h2>`+(a.length?[...a].reverse().map(n=>`<div class="t" style="--oc:${co(n.f||n.x||me)}"><div class="n">${n.id>r?'<i class="dot" style="background:var(--ac)"></i> ':''}${ntx(n)}<span class="mu">${new Date(n.ts).toLocaleString('ar-EG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div></div>`).join(''):'<div class="empty">مفيش إشعارات</div>')+`</section>`;
+ return pushCard()+`<section class="card"><h2>الإشعارات</h2>`+(a.length?[...a].reverse().map(n=>`<div class="t" style="--oc:${co(n.f||n.x||me)}"><div class="n">${n.id>r?'<i class="dot" style="background:var(--ac)"></i> ':''}${ntx(n)}<span class="mu">${new Date(n.ts).toLocaleString('ar-EG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div></div>`).join(''):'<div class="empty">مفيش إشعارات</div>')+`</section>`;
 }
 function chatUI(){
  if(!conv){
