@@ -246,7 +246,7 @@ const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp
 const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
 const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const nm=k=>W[k][0],co=k=>W[k][1];
-let cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
+let cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
@@ -298,7 +298,9 @@ function cmerge(j){
  (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++}});
  msgs.sort((a,b)=>a.id-b.id);
  csince=msgs.reduce((a,m)=>Math.max(a,m.id),csince);
- if(first&&!rdn){['all',...K.filter(k=>k!==me)].forEach(c=>{rd[c]=cmax(c)});svrd()}
+ const sr=j.rd||{},hs=Object.keys(sr).length>0;
+ Object.keys(sr).forEach(c=>{if(sr[c]>(rd[c]||0)){rd[c]=sr[c];rs[c]=Math.max(rs[c]||0,sr[c])}});
+ if(first&&!rdn&&!hs){['all',...K.filter(k=>k!==me)].forEach(c=>{rd[c]=cmax(c)});svrd()}
  if(conv&&cmax(conv)>(rd[conv]||0)){rd[conv]=cmax(conv);svrd()}
  const g=con.join()+'|'+cv+'|'+unrAll()+'|'+(conv?conv:Math.floor(Date.now()/60000));
  if(g!==csig){csig=g;draw()}
@@ -310,7 +312,13 @@ async function ping(){
  if(!j.ok){if(/معروف/.test(j.err||''))cOK=false;return}
  cmerge(j);
 }
-function openC(c){conv=c;rd[c]=cmax(c);svrd();stick=1;draw();ping()}
+async function sendRd(c){
+ if(!c||(rd[c]||0)<=(rs[c]||0))return;
+ const v=rd[c];rs[c]=v;const j=await pcall('mread',{c,id:v});
+ if(j&&j.ok)cmerge(j);else rs[c]=0;
+}
+function closeC(){const c=conv;conv=null;sendRd(c)}
+function openC(c){conv=c;rd[c]=Math.max(rd[c]||0,cmax(c));svrd();stick=1;sendRd(c);draw();ping()}
 async function msend(){
  const el=$('mi'),t=el?el.value.trim():'';if(!t||!conv||sndg)return;
  sndg=1;const j=await pcall('msend',{to:conv,text:t});sndg=0;
@@ -329,7 +337,7 @@ function chatUI(){
  const L=msgs.filter(m=>mid(m)===conv);
  const bub=m=>{const mine=m.f===me,tm=new Date(m.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
   return `<div class="mb${mine?' me':''}">${conv==='all'&&!mine?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}<span class="mx">${E(m.x)}</span><span class="mt">${tm}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
- return `<section class="card cv"><div class="ch3"><button onclick="conv=null;draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}</div><div class="ml" id="ml">${L.length?L.map(bub).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div><div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
+ return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}</div><div class="ml" id="ml">${L.length?L.map(bub).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div><div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
 }
 function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
 /* actions: same backend calls and payloads as before */
@@ -350,7 +358,7 @@ async function fin(){
  const j=await go('reset',{dec});
  if(j.ok){rv=0;dec={};viewB=0;draw()}
 }
-const setTab=t=>{if(t!=='m'||tab==='m')conv=null;tab=t;sheet=0;draw();scrollTo(0,0)};
+const setTab=t=>{if(t!=='m'||tab==='m')closeC();tab=t;sheet=0;draw();scrollTo(0,0)};
 const nav=d=>{viewB=Math.min(st.cur,Math.max(1,(viewB||st.cur)+d));if(viewB===st.cur)viewB=0;draw()};
 const openB=k=>{viewB=k===st.cur?0:k;tab='h';draw();scrollTo(0,0)};
 /* scene: floors come from real tasks of the viewed building */
