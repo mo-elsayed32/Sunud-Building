@@ -235,7 +235,8 @@ body:has(.fab) .nav{padding-left:90px}
 #bl .ic{position:relative}.bd2{position:absolute;top:0;inset-inline-end:0;min-width:16px;height:16px;border-radius:8px;background:var(--ac);color:#1a1405;font-size:10px;line-height:16px;font-weight:700;padding:0 4px}
 
 .mb[id^=m]{touch-action:pan-y;-webkit-touch-callout:none}.mb[id^=m] .mx{-webkit-user-select:none;user-select:none}
-#mmn{position:fixed;inset-inline:0;margin:auto;width:max-content;max-width:90vw;display:flex;gap:2px;background:var(--cd2,#18223c);border:1px solid #ffffff22;border-radius:14px;padding:4px;z-index:60;box-shadow:0 8px 24px #0008}#mmn button{background:transparent;border:0;color:var(--tx,#e8edf7);padding:10px 14px;font:inherit;border-radius:10px}#mmn button:active{background:#ffffff14}
+#mmn{flex-wrap:wrap;justify-content:center;position:fixed;inset-inline:0;margin:auto;width:max-content;max-width:90vw;display:flex;gap:2px;background:var(--cd2,#18223c);border:1px solid #ffffff22;border-radius:14px;padding:4px;z-index:60;box-shadow:0 8px 24px #0008}#mmn button{background:transparent;border:0;color:var(--tx,#e8edf7);padding:10px 14px;font:inherit;border-radius:10px}#mmn button:active{background:#ffffff14}
+.rxr{display:flex;flex-basis:100%;justify-content:center}#mmn .rxr button{padding:6px 8px;font-size:20px}.tk{opacity:.5;font-size:11px}.tk.r{opacity:1;color:#0b3d91;font-weight:700}.ty{font-size:12px;color:var(--ac);margin-inline-start:8px}.rxs{display:flex;gap:4px;flex-wrap:wrap}.rxc{background:#00000030;border:0;border-radius:10px;padding:1px 6px;min-height:0;font-size:12px;color:inherit;box-shadow:none}.rxc.on{outline:1px solid var(--ac)}
 </style></head><body>
 <div id="lg" class="card">
  <h1>Sunud Building</h1>
@@ -254,7 +255,7 @@ const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp
 const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
 const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const nm=k=>W[k][0],co=k=>W[k][1];
-let ntl=null,nrl=0,rto=0,c6=0,c7=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
+let c8=0,crr={},crx={},ced={},cty=[],edt=0,lty=0,ntl=null,nrl=0,rto=0,c6=0,c7=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
@@ -301,7 +302,7 @@ async function pcall(a,x={}){
  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});return await r.json()}catch(e){return null}
 }
 function cmerge(j){
- const first=!cOK;cOK=true;if(j.v>=6)c6=1;if(j.v>=7)c7=1;cseen=j.seen||{};con=j.on||[];crecv=Date.now();
+ const first=!cOK;cOK=true;if(j.v>=6)c6=1;if(j.v>=7)c7=1;if(j.rr){c8=1;crr=j.rr;crx=j.rx||{};ced=j.ed||{};cty=j.ty||[]}cseen=j.seen||{};con=j.on||[];crecv=Date.now();
  (j.del||[]).forEach(id=>{const i=msgs.findIndex(m=>m.id===id);if(i>=0){msgs.splice(i,1);cv++}});
  (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++}});
  msgs.sort((a,b)=>a.id-b.id);
@@ -310,7 +311,7 @@ function cmerge(j){
  Object.keys(sr).forEach(c=>{if(sr[c]>(rd[c]||0)){rd[c]=sr[c];rs[c]=Math.max(rs[c]||0,sr[c])}});
  if(first&&!rdn&&!hs){['all',...K.filter(k=>k!==me)].forEach(c=>{rd[c]=cmax(c)});svrd()}
  if(conv&&cmax(conv)>(rd[conv]||0)){rd[conv]=cmax(conv);svrd()}
- const g=con.join()+'|'+cv+'|'+unrAll()+'|'+(conv?conv:Math.floor(Date.now()/60000));
+ const g=con.join()+'|'+cv+'|'+unrAll()+'|'+(conv?conv:Math.floor(Date.now()/60000))+'|'+(c8?JSON.stringify([crr,crx,ced,cty]):'');
  if(g!==csig){csig=g;draw()}
 }
 async function ping(){
@@ -325,22 +326,30 @@ async function sendRd(c){
  const v=rd[c];rs[c]=v;const j=await pcall('mread',{c,id:v});
  if(j&&j.ok)cmerge(j);else rs[c]=0;
 }
-function closeC(){const c=conv;conv=null;rto=0;sendRd(c)}
-function openC(c){conv=c;rto=0;rd[c]=Math.max(rd[c]||0,cmax(c));svrd();stick=1;sendRd(c);draw();ping()}
+function closeC(){const c=conv;conv=null;rto=0;edt=0;sendRd(c)}
+function openC(c){conv=c;rto=0;edt=0;rd[c]=Math.max(rd[c]||0,cmax(c));svrd();stick=1;sendRd(c);draw();ping()}
 async function msend(){
  const el=$('mi'),t=el?el.value.trim():'';if(!t||!conv||sndg)return;
- sndg=1;const j=await pcall('msend',{to:conv,text:t,...(rto&&c6?{re:rto}:{})});sndg=0;
- if(j&&j.ok){rto=0;if($('mi'))$('mi').value='';stick=1;cmerge(j);rd[conv]=cmax(conv);svrd();draw()}else toast((j&&j.err)||'مفيش اتصال');
+ sndg=1;const j=edt&&c8?await pcall('medit',{id:edt,text:t}):await pcall('msend',{to:conv,text:t,...(rto&&c6?{re:rto}:{})});sndg=0;
+ if(j&&j.ok){rto=0;edt=0;if($('mi'))$('mi').value='';stick=1;cmerge(j);rd[conv]=cmax(conv);svrd();draw()}else toast((j&&j.err)||'مفيش اتصال');
 }
 async function mdel(id){
  if(!confirm('مسح الرسالة؟'))return;
  const j=await pcall('mdel',{id});if(j&&j.ok)cmerge(j);else toast((j&&j.err)||'مفيش اتصال');
 }
 function rstrip(){
+ if(edt){return `<div class="rp"><span><b>تعديل</b></span><button class="mx2" onclick="edt=0;$('mi').value='';draw()" aria-label="إلغاء">✕</button></div>`}
  const o=rto?msgs.find(x=>x.id===rto):0;if(rto&&!o)rto=0;
  return o?`<div class="rp"><span><b>${nm(o.f)}</b> ${E(o.x.slice(0,60))}</span><button class="mx2" onclick="rpl(0)" aria-label="إلغاء">✕</button></div>`:'';
 }
-function rpl(id){rto=id;draw();if(id&&$('mi'))$('mi').focus()}
+function rpl(id){rto=id;edt=0;draw();if(id&&$('mi'))$('mi').focus()}
+const RXS=['👍','❤️','😂','😮','😢','🙏'],mtx=m=>ced[m.id]!==undefined?ced[m.id]:m.x;
+async function mrx(id,e){mclose();const cur=(crx[id]||{})[me];const j=await pcall('mrx',{id,e:cur===e?'':e});if(j&&j.ok){cmerge(j);draw()}else toast((j&&j.err)||'مفيش اتصال')}
+function medit(id){mclose();const m=msgs.find(x=>x.id===id);if(!m)return;edt=id;rto=0;draw();const i=$('mi');if(i){i.value=mtx(m);i.focus()}}
+function tyP(){if(!c8||!conv||Date.now()-lty<3000)return;const i=$('mi');if(!i||!i.value.trim())return;lty=Date.now();pcall('ty',{to:conv}).then(j=>{if(j&&j.ok)cmerge(j)})}
+function tyS(){if(!c8||!conv)return'';const a=cty.filter(x=>conv==='all'?x[1]==='all':(x[0]===conv&&x[1]===me)).map(x=>nm(x[0]));return a.length?`<span class="ty">${a.join('، ')} بيكتب...</span>`:''}
+function rxS(m){const o=crx[m.id];if(!c8||!o)return'';const c={};Object.keys(o).forEach(k=>{c[o[k]]=(c[o[k]]||0)+1});const mine=o[me];return `<span class="rxs">${Object.keys(c).map(e=>`<button class="rxc${mine===e?' on':''}" onclick="mrx(${m.id},'${e}')">${e}${c[e]>1?' '+c[e]:''}</button>`).join('')}</span>`}
+function tkS(m){if(!c8||m.f!==me||conv==='all')return'';return (m.id<=(crr[conv]||0))?' <span class="tk r">✓✓</span>':' <span class="tk">✓</span>'}
 function jm(id){const e=$('m'+id);if(e){e.scrollIntoView({block:'center'});e.classList.add('fl');setTimeout(()=>e.classList.remove('fl'),1200)}}
 /* transfer notifications (needs the newer script; no bell on the old one) */
 const nts=()=>st&&Array.isArray(st.nt)?st.nt:null;
@@ -354,18 +363,19 @@ async function pushOn(){try{if(await Notification.requestPermission()!=='granted
 function hidSet(){try{return new Set(JSON.parse(localStorage.getItem('hd_'+me)||'[]'))}catch(e){return new Set()}}
 function hideMsg(id){const a=[...hidSet(),id].slice(-500);try{localStorage.setItem('hd_'+me,JSON.stringify(a))}catch(e){}}
 function mclose(){const e=document.getElementById('mmn');if(e)e.remove()}
-function mcopy(id){const m=msgs.find(x=>x.id===id);mclose();if(!m)return;const t=m.x;const ok=()=>toast('اتنسخت');try{navigator.clipboard.writeText(t).then(ok,()=>{fbc(t);ok()})}catch(e){fbc(t);ok()}}
+function mcopy(id){const m=msgs.find(x=>x.id===id);mclose();if(!m)return;const t=mtx(m);const ok=()=>toast('اتنسخت');try{navigator.clipboard.writeText(t).then(ok,()=>{fbc(t);ok()})}catch(e){fbc(t);ok()}}
 function fbc(t){const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()}
 function mhide(id){mclose();hideMsg(id);draw()}
-function mmenu(id,el){mclose();const r=el.getBoundingClientRect(),d=document.createElement('div');d.id='mmn';d.innerHTML=`<button onclick="mcopy(${id})">نسخ</button>${c6?`<button onclick="mclose();rpl(${id})">رد</button>`:''}<button onclick="mhide(${id})">مسح عندي</button>`;d.style.top=Math.min(Math.max(8,r.top-48),innerHeight-60)+'px';document.body.appendChild(d)}
+function mmenu(id,el){mclose();const r=el.getBoundingClientRect(),d=document.createElement('div');d.id='mmn';const mm=msgs.find(x=>x.id===id);d.innerHTML=`${c8?`<div class="rxr">${RXS.map(e=>`<button onclick="mrx(${id},'${e}')">${e}</button>`).join('')}</div>`:''}<button onclick="mcopy(${id})">نسخ</button>${c8&&mm&&mm.f===me?`<button onclick="medit(${id})">تعديل</button>`:''}${c6?`<button onclick="mclose();rpl(${id})">رد</button>`:''}<button onclick="mhide(${id})">مسح عندي</button>`;d.style.top=Math.min(Math.max(8,r.top-(c8?96:48)),innerHeight-(c8?110:60))+'px';document.body.appendChild(d)}
 (function(){let g=null,lp=0;
  const mb=t=>t&&t.closest?t.closest('.mb[id^="m"]'):null;
- addEventListener('touchstart',e=>{const b=mb(e.target);if(!b||e.touches.length!==1){if(!e.target.closest||!e.target.closest('#mmn'))mclose();g=null;return}const t=e.touches[0];g={b,id:+b.id.slice(1),x:t.clientX,y:t.clientY,dx:0,sw:0,lp:0};clearTimeout(lp);lp=setTimeout(()=>{if(g&&!g.sw&&Math.abs(g.dx)<8){g.lp=1;window.__lpt=Date.now();mmenu(g.id,g.b)}},500)},{passive:true});
+ addEventListener('touchstart',e=>{const b=mb(e.target);if(!b||e.touches.length!==1){if(!e.target.closest||!e.target.closest('#mmn'))mclose();g=null;return}const t=e.touches[0];g={b,id:+b.id.slice(1),x:t.clientX,y:t.clientY,dx:0,sw:0,lp:0};clearTimeout(lp);lp=setTimeout(()=>{if(g&&!g.sw&&Math.abs(g.dx)<8){g.lp=1;window.__lph=1;mmenu(g.id,g.b)}},500)},{passive:true});
  addEventListener('touchmove',e=>{if(!g)return;const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;g.dx=dx;if(!g.sw){if(Math.abs(dy)>10){clearTimeout(lp);g=null;return}if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.5){g.sw=1;clearTimeout(lp)}}if(g.sw&&c6){const v=Math.max(0,Math.min(70,dx));g.b.style.transition='none';g.b.style.transform=`translateX(${v}px)`}},{passive:true});
- addEventListener('touchend',()=>{clearTimeout(lp);if(!g)return;const b=g.b;b.style.transition='transform .15s';b.style.transform='';if(g.sw&&c6&&g.dx>=60)rpl(g.id);g=null},{passive:true});
- addEventListener('touchcancel',()=>{clearTimeout(lp);if(g){g.b.style.transform=''}g=null},{passive:true});
+ addEventListener('touchend',()=>{clearTimeout(lp);if(!g)return;if(g.lp){window.__lph=0;window.__lpt=Date.now()}const b=g.b;b.style.transition='transform .15s';b.style.transform='';if(g.sw&&c6&&g.dx>=60)rpl(g.id);g=null},{passive:true});
+ addEventListener('touchcancel',()=>{clearTimeout(lp);window.__lph=0;if(g){g.b.style.transform=''}g=null},{passive:true});
+ addEventListener('click',e=>{if(window.__lph||Date.now()-(window.__lpt||0)<400){e.stopPropagation();e.preventDefault()}},true);
  addEventListener('contextmenu',e=>{if(mb(e.target))e.preventDefault()});
- addEventListener('click',e=>{if(Date.now()-(window.__lpt||0)<700)return;if(!e.target.closest('#mmn'))mclose()});
+ addEventListener('click',e=>{if(window.__lph||Date.now()-(window.__lpt||0)<400)return;if(!e.target.closest('#mmn'))mclose()});
 })();
 function notifs(){
  const a=nts()||[],r=st.nr||0;
@@ -380,8 +390,8 @@ function chatUI(){
  const hd=hidSet();const L=msgs.filter(m=>mid(m)===conv&&!hd.has(m.id));
  const bub=m=>{const mine=m.f===me,tm=new Date(m.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
   const o=m.re?msgs.find(x=>x.id===m.re):0,q=m.re?`<button class="mq" onclick="jm(${m.re})">${o?`<b>${nm(o.f)}</b> ${E(o.x.slice(0,60))}`:'رسالة محذوفة'}</button>`:'';
-  return `<div class="mb${mine?' me':''}" id="m${m.id}">${conv==='all'&&!mine?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}${q}<span class="mx">${E(m.x)}</span><span class="mt">${tm}${c6?` <button class="mx2" onclick="rpl(${m.id})" aria-label="رد">↩</button>`:''}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
- return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}</div><div class="ml" id="ml">${L.length?L.map(bub).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div>${rstrip()}<div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
+  return `<div class="mb${mine?' me':''}" id="m${m.id}">${conv==='all'&&!mine?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}${q}<span class="mx">${E(mtx(m))}</span>${rxS(m)}<span class="mt">${tm}${c8&&ced[m.id]!==undefined?' معدّلة':''}${tkS(m)}${c6?` <button class="mx2" onclick="rpl(${m.id})" aria-label="رد">↩</button>`:''}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
+ return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}${tyS()}</div><div class="ml" id="ml">${L.length?L.map(bub).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div>${rstrip()}<div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" oninput="tyP()" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
 }
 function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
 /* actions: same backend calls and payloads as before */
