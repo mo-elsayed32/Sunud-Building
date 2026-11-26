@@ -235,7 +235,7 @@ const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp
 const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
 const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const nm=k=>W[k][0],co=k=>W[k][1];
-let opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
+let lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
@@ -246,7 +246,7 @@ async function call(a,x={}){
   const j=await r.json();
   if(!j.ok){$('sy').textContent='!';return j}
   adm=j.role==='admin';
-  const s=JSON.stringify(j.st);if(s!==raw){raw=s;st=j.st;draw()}
+  lk=adm&&Array.isArray(j.locked)?j.locked.filter(k=>W[k]):[];const s=JSON.stringify([j.st,lk]);if(s!==raw){raw=s;st=j.st;draw()}
   $('sy').textContent='●';return j;
  }catch(e){$('sy').textContent='✕';return{ok:false,err:'مفيش اتصال'}}
 }
@@ -270,6 +270,7 @@ async function add(){
 async function act(f,id,...r){if(busy[id])return;busy[id]=1;draw();try{await f(id,...r)}finally{delete busy[id];draw()}}
 const dn=id=>act(i=>go('done',{id:i}),id),mv=(id,to)=>act(i=>go('move',{id:i,to}),id),rq=id=>act(i=>go('req',{id:i}),id);
 const rrx=(id,ok)=>{if(busy['r'+id])return;busy['r'+id]=1;draw();go('res',{id,ok}).finally(()=>{delete busy['r'+id];draw()})};
+const ul=k=>act(i=>go('unlock',{name:i}),k);
 const cfg=()=>go('cfg',{bpb:+$('c1').value,bpc:+$('c2').value});
 const dc=(id,v)=>{dec[id]=v;draw()};
 const DAY=864e5,dqs=()=>st.tasks.filter(t=>t.dq&&t.s!=='cancelled'),dleft=t=>Math.max(1,Math.ceil((t.dq+7*DAY-Date.now())/DAY));
@@ -350,7 +351,7 @@ const tg=k=>{opn[k]=!opn[k];draw()};
 function team(){
  const cur=st.cur,vb=viewB||cur,ts=byB(vb),live=vb===cur,o=ts.filter(t=>t.s==='open').length;
  const list=adm?K:K.filter(k=>k!==me);
- const req=(st.reqs.length+dqs().length)&&adm?`<div class="row sp rq"><span>طلبات</span><button class="p" onclick="setTab('s')">${st.reqs.length+dqs().length}</button></div>`:'';
+ const req=(st.reqs.length+dqs().length+lk.length)&&adm?`<div class="row sp rq"><span>طلبات</span><button class="p" onclick="setTab('s')">${st.reqs.length+dqs().length+lk.length}</button></div>`:'';
  const cards=list.map(k=>{const m=own1(ts,k),op=!!opn[k],mt=ts.filter(t=>t.owner===k);
   return `<div class="tm"><button class="th" onclick="tg('${k}')" aria-expanded="${op}"><i class="dot" style="background:${co(k)}"></i><b>${nm(k)}</b><span class="mu">${m.a.length?m.dn+'/'+m.a.length:'—'}</span><span class="bar"><i style="width:${m.p}%;background:${co(k)}"></i></span><span class="chv">${op?'⌃':'⌄'}</span></button>${op?`<div class="tb">${tasks(mt,!live)}</div>`:''}</div>`}).join('');
  return `<div class="home"><div class="l">${scn(ts,vb,live,o)}</div><div class="r"><section class="flat teamc">${req}${cards}</section></div></div>`;
@@ -367,6 +368,7 @@ function city(){
 function settings(){
  const c=st.cfg,ts=byB(st.cur),op=ts.filter(t=>t.s==='open'),dn=ts.filter(t=>t.s==='done').length;
  let h='';
+ if(lk.length)h+=`<section class="card"><h2>متقفلين</h2>`+lk.map(k=>`<div class="t" style="--oc:${co(k)}"><div class="n">${nm(k)}</div><button class="p" ${busy[k]?'disabled':''} onclick="ul('${k}')">فتح</button></div>`).join('')+`</section>`;
  if(st.reqs.length)h+=`<section class="card"><h2>طلبات النقل</h2>`+st.reqs.map(r=>{const t=st.tasks.find(x=>x.id===r.tid);if(!t)return'';const b=busy['r'+r.id];return `<div class="t" style="--oc:${co(r.to)}"><div class="n">${nm(r.to)} يطلب «${E(t.title)}»<span class="mu">عند ${nm(t.owner)}</span></div><button class="p" ${b?'disabled':''} onclick="rrx(${r.id},1)">موافقة</button><button ${b?'disabled':''} onclick="rrx(${r.id},0)">رفض</button></div>`}).join('')+`</section>`;
  if(dqs().length)h+=`<section class="card"><h2>طلبات المسح</h2>`+dqs().map(t=>{const b=busy[t.id];return `<div class="t" style="--oc:${co(t.owner)}"><div class="n">${E(t.title)}<span class="mu">${nm(t.owner)} · ${dleft(t)} يوم</span></div><button class="p" ${b?'disabled':''} onclick="dres(${t.id},1)">مسح</button><button ${b?'disabled':''} onclick="dres(${t.id},0)">رفض</button></div>`}).join('')+`</section>`;
  h+=`<section class="card"><h2>البناء</h2><div class="row"><label>مباني/بلوك <input id="c1" class="num" type="number" min="1" max="50" value="${c.bpb}"></label><label>بلوكات/مدينة <input id="c2" class="num" type="number" min="1" max="50" value="${c.bpc}"></label><button onclick="cfg()">حفظ</button></div></section>`;
@@ -390,7 +392,7 @@ function draw(){
  const IC={u:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.8-6 6-6s6 2.5 6 6M16 5.5a3 3 0 0 1 0 5.6M18 14.5c2 .8 3 2.6 3 5.5"/>',h:'<path d="M5 20V8l7-4 7 4v12M9 20v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01"/>',c:'<path d="M3 20h18M5 20V10h5v10M10 20V5h5v15M15 20v-7h4v7"/>',s:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>'};
  const nb=(k,l,b)=>`<button class="${tab===k?'a':''}" onclick="setTab('${k}')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><span>${l}</span>${b?`<span class="bd">${b}</span>`:''}</button>`;
  $('v').innerHTML=v;
- $('fb').innerHTML=((adm?(tab==='h'||tab==='u'):tab==='h')&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet?sheetUI():'')+`<div class="nav"><div>${nb('h','مهامي')}${nb('u','الفريق')}${nb('c','Building')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length):''}</div></div>`;
+ $('fb').innerHTML=((adm?(tab==='h'||tab==='u'):tab==='h')&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet?sheetUI():'')+`<div class="nav"><div>${nb('h','مهامي')}${nb('u','الفريق')}${nb('c','Building')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length+lk.length):''}</div></div>`;
  if(keep!==null&&$('ti')){$('ti').value=keep;$('ti').focus()}
  seen=new Set(st.tasks.filter(t=>t.s==='done').map(t=>t.id));
 }
