@@ -46,7 +46,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .t{display:flex;gap:10px;align-items:center;padding:10px 12px;margin-bottom:8px;background:var(--cd2);border-radius:12px;border-inline-start:5px solid var(--oc)}
 .t .n{flex:1;min-width:0;overflow-wrap:anywhere}.t .mu{display:block}
 .t.d .n{text-decoration:line-through;color:var(--mu)}.t.d{opacity:.7}
-.t button{min-width:64px}.t select{width:58px;padding:0 6px;font-size:18px;text-align:center}
+.dq{color:var(--ac);font-weight:500}.t button{min-width:64px}.t select{width:58px;padding:0 6px;font-size:18px;text-align:center}
 .t .ok{min-width:52px;font-size:20px;background:var(--ac);color:#1a1405;border-color:var(--ac);font-weight:700}
 .empty{text-align:center;color:var(--mu);padding:22px 0}
 /* city */
@@ -131,6 +131,8 @@ const dn=id=>act(i=>go('done',{id:i}),id),mv=(id,to)=>act(i=>go('move',{id:i,to}
 const rrx=(id,ok)=>{if(busy['r'+id])return;busy['r'+id]=1;draw();go('res',{id,ok}).finally(()=>{delete busy['r'+id];draw()})};
 const cfg=()=>go('cfg',{bpb:+$('c1').value,bpc:+$('c2').value});
 const dc=(id,v)=>{dec[id]=v;draw()};
+const DAY=864e5,dqs=()=>st.tasks.filter(t=>t.dq&&t.s!=='cancelled'),dleft=t=>Math.max(1,Math.ceil((t.dq+7*DAY-Date.now())/DAY));
+const dreq=id=>{if(confirm('تطلب مسح المهمة؟ هتتمسح لما الأدمن يوافق أو بعد 7 أيام.'))act(i=>go('dreq',{id:i}),id)},dcan=id=>act(i=>go('dcancel',{id:i}),id),dres=(id,ok)=>act((i,o)=>go('dres',{id:i,ok:o}),id,ok),ddel=id=>{if(confirm('تمسح المهمة نهائيًا؟'))act(i=>go('ddel',{id:i}),id)};
 async function fin(){
  if(!confirm('تقفل المبنى وتبدأ اللي بعده؟'))return;
  const j=await go('reset',{dec});
@@ -180,9 +182,12 @@ function tasks(ts,ro){
   if(!ro){
    if(own)a=t.s==='done'?`<button ${b?'disabled':''} onclick="dn(${t.id})">تراجع</button>`:`<button class="ok" ${b?'disabled':''} onclick="dn(${t.id})" aria-label="تمّت">✔</button>`;
    if(adm&&t.s==='open')a+=`<select ${b?'disabled':''} aria-label="نقل" onchange="mv(${t.id},this.value)"><option>⇄</option>${K.filter(k=>k!==t.owner).map(k=>`<option value="${k}">${nm(k)}</option>`).join('')}</select>`;
+   if(t.dq)a=(adm?`<button class="p" ${b?'disabled':''} onclick="dres(${t.id},1)">مسح</button>`:'')+((own||adm)?`<button ${b?'disabled':''} onclick="${adm&&!own?`dres(${t.id},0)`:`dcan(${t.id})`}">${adm&&!own?'رفض':'إلغاء المسح'}</button>`:'');
+   else if(adm)a+=`<button aria-label="مسح" ${b?'disabled':''} onclick="ddel(${t.id})">🗑</button>`;
+   else if(own)a+=`<button aria-label="طلب مسح" ${b?'disabled':''} onclick="dreq(${t.id})">🗑</button>`;
    if(!adm&&!own&&t.s==='open')a=`<button ${pend||b?'disabled':''} onclick="rq(${t.id})">${pend?'اتطلبت':'اطلبها'}</button>`;
   }
-  return `<div class="t${t.s==='done'?' d':''}" style="--oc:${co(t.owner)}"><div class="n">${E(t.title)}<span class="mu">${nm(t.owner)}</span></div>${a}</div>`}).join('');
+  return `<div class="t${t.s==='done'?' d':''}" style="--oc:${co(t.owner)}"><div class="n">${E(t.title)}<span class="mu">${nm(t.owner)}${t.dq?` · <b class="dq">بانتظار المسح · ${dleft(t)} يوم</b>`:''}</span></div>${a}</div>`}).join('');
 }
 function home(){
  const c=st.cfg,cur=st.cur,vb=viewB||cur,ts=byB(vb),live=vb===cur,o=ts.filter(t=>t.s==='open').length,d=ts.length-o;
@@ -192,7 +197,7 @@ function home(){
   <div class="cap"><div><div class="mu">مبنى ${vb}${live?'':' · مقفول'}</div><div class="big">${state}</div><div class="mu">بلوك ${Math.floor(ic/c.bpb)+1}/${c.bpc} · مبنى ${ic%c.bpb+1}/${c.bpb}${cities?' · مدينة '+(cities+1):''}</div></div>
   <div class="nv"><button onclick="nav(-1)" ${vb<=1?'disabled':''} aria-label="السابق">›</button><button onclick="nav(1)" ${live?'disabled':''} aria-label="التالي">‹</button></div></div></section>
   <section class="card">${members(ts)}</section></div>
-  <div class="r"><section class="card">${st.reqs.length&&adm?`<div class="row sp" style="margin-bottom:10px"><span>طلبات النقل</span><button class="p" onclick="setTab('s')">${st.reqs.length}</button></div>`:''}${tasks(ts,!live)}</section></div></div>`;
+  <div class="r"><section class="card">${(st.reqs.length+dqs().length)&&adm?`<div class="row sp" style="margin-bottom:10px"><span>طلبات</span><button class="p" onclick="setTab('s')">${st.reqs.length+dqs().length}</button></div>`:''}${tasks(ts,!live)}</section></div></div>`;
 }
 function city(){
  const c=st.cfg,cur=st.cur,per=c.bpb*c.bpc,cl=cur-1,base=Math.floor(cl/per)*per,cities=Math.floor(cl/per);
@@ -207,6 +212,7 @@ function settings(){
  const c=st.cfg,ts=byB(st.cur),op=ts.filter(t=>t.s==='open'),dn=ts.filter(t=>t.s==='done').length;
  let h='';
  if(st.reqs.length)h+=`<section class="card"><h2>طلبات النقل</h2>`+st.reqs.map(r=>{const t=st.tasks.find(x=>x.id===r.tid);if(!t)return'';const b=busy['r'+r.id];return `<div class="t" style="--oc:${co(r.to)}"><div class="n">${nm(r.to)} يطلب «${E(t.title)}»<span class="mu">عند ${nm(t.owner)}</span></div><button class="p" ${b?'disabled':''} onclick="rrx(${r.id},1)">موافقة</button><button ${b?'disabled':''} onclick="rrx(${r.id},0)">رفض</button></div>`}).join('')+`</section>`;
+ if(dqs().length)h+=`<section class="card"><h2>طلبات المسح</h2>`+dqs().map(t=>{const b=busy[t.id];return `<div class="t" style="--oc:${co(t.owner)}"><div class="n">${E(t.title)}<span class="mu">${nm(t.owner)} · ${dleft(t)} يوم</span></div><button class="p" ${b?'disabled':''} onclick="dres(${t.id},1)">مسح</button><button ${b?'disabled':''} onclick="dres(${t.id},0)">رفض</button></div>`}).join('')+`</section>`;
  h+=`<section class="card"><h2>البناء</h2><div class="row"><label>مباني/بلوك <input id="c1" class="num" type="number" min="1" max="50" value="${c.bpb}"></label><label>بلوكات/مدينة <input id="c2" class="num" type="number" min="1" max="50" value="${c.bpc}"></label><button onclick="cfg()">حفظ</button></div></section>`;
  if(!rv)h+=`<section class="card"><h2>نهاية المبنى ${st.cur}</h2><div class="sm"><span>${dn} مكتملة</span><span>${op.length} مفتوحة</span></div><button class="p" onclick="rv=1;dec={};draw()">مراجعة التصفير</button></section>`;
  else{const all=op.every(t=>dec[t.id]),cr=op.filter(t=>dec[t.id]=='carry').length,ca=op.filter(t=>dec[t.id]=='cancel').length;
@@ -227,7 +233,7 @@ function draw(){
  const v=tab==='c'?city():tab==='s'?settings():home();
  const nb=(k,l,b)=>`<button class="${tab===k?'a':''}" onclick="setTab('${k}')">${l}${b?`<span class="bd">${b}</span>`:''}</button>`;
  $('v').innerHTML=v;
- $('fb').innerHTML=(adm&&tab==='h'&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet&&adm?sheetUI():'')+`<div class="nav"><div>${nb('h','المبنى')}${nb('c','المدينة')}${adm?nb('s','الإعدادات',st.reqs.length):''}</div></div>`;
+ $('fb').innerHTML=(adm&&tab==='h'&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet&&adm?sheetUI():'')+`<div class="nav"><div>${nb('h','المبنى')}${nb('c','المدينة')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length):''}</div></div>`;
  if(keep!==null&&$('ti')){$('ti').value=keep;$('ti').focus()}
  seen=new Set(st.tasks.filter(t=>t.s==='done').map(t=>t.id));
 }
