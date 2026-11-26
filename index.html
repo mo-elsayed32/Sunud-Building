@@ -11,7 +11,7 @@ h1{font-size:20px;margin:0}h2{font-size:15px;color:var(--mu);margin:0 0 10px}
 .card{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:12px}
 input,select,button{font:inherit;color:var(--tx);background:#0e1730;border:1px solid var(--ln);border-radius:10px;padding:8px 12px}
 button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac)}
-button.p,.ch button.on{background:var(--ac);color:#1a1405;border-color:var(--ac);font-weight:700}
+button.p,.ch button.on,.ch2 button.on{background:var(--ac);color:#1a1405;border-color:var(--ac);font-weight:700}
 button:disabled{opacity:.4;cursor:not-allowed}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
@@ -33,28 +33,36 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .cl{border:1px solid var(--ac);border-radius:10px;padding:8px 10px;margin-top:10px;font-size:14px}
 .lg2{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.lg2 span{font-size:12px;padding:2px 8px;border-radius:8px;border:1px solid var(--mu)}.lg2 .s2{background:var(--mu);color:#0e1525}
 @media(prefers-reduced-motion:reduce){.bc{animation:none}}
+body{padding:max(12px,env(safe-area-inset-top)) 12px max(24px,env(safe-area-inset-bottom))}
+button,select,input{min-height:44px}
+.nm{display:grid;grid-template-columns:1fr 1fr;gap:8px}.nm button{justify-content:flex-start}
+.go{width:100%;margin-top:10px;min-height:48px}
+.add{display:flex;gap:8px;margin-bottom:6px}.add input{flex:1;min-width:0}.add button{min-width:48px;font-size:20px;padding:0 14px}
+.t{flex-wrap:nowrap}.t .n{min-width:0}.t button{min-width:72px}.t select{width:60px;padding:0 6px;font-size:18px;text-align:center}.t.rr{flex-wrap:wrap}
+details.s{margin-top:4px}details.s summary{cursor:pointer;color:var(--mu);min-height:44px;display:flex;align-items:center}
+@media(max-width:360px){.add{flex-wrap:wrap}.add input{flex-basis:100%}.add select{flex:1}}
+.ch2{display:flex;gap:8px}.ch2 button{flex:1}
 .crane.on .hk{animation:sw 5s ease-in-out infinite}
 @keyframes sw{50%{transform:translateX(-70px)}}
 @media(prefers-reduced-motion:reduce){.crane.on .hk{animation:none}}
 </style></head><body>
 <div id="lg" class="card">
- <h1>Sunud Building</h1><p class="mu">اختار اسمك وادخل رمز الفريق</p>
- <div class="row ch" id="names"></div><p></p>
- <div class="row"><input id="code" type="password" placeholder="الرمز" autocomplete="off"><button class="p" onclick="login()">دخول</button></div>
- <p id="le" class="mu"></p>
+ <h1>Sunud Building</h1><p></p>
+ <div class="nm ch" id="names"></div>
+ <input id="code" type="password" placeholder="الرمز" autocomplete="off" style="width:100%;margin-top:10px" onkeydown="if(event.key==='Enter')login()">
+ <button class="p go" onclick="login()">دخول</button>
+ <p id="le" class="mu" role="alert"></p>
 </div>
 <div id="mn" hidden>
  <div class="top"><div><h1>Sunud Building</h1><span class="mu" id="who"></span></div><div class="row"><span id="sy" class="mu">●</span><button onclick="out()">خروج</button></div></div>
  <section class="card" id="stg"></section>
- <section class="card"><h2>مهمة جديدة</h2><div class="row"><input id="ti" placeholder="اكتب المهمة" maxlength="120" style="flex:1;min-width:150px"><select id="ow"></select><button class="p" onclick="add()">إضافة</button></div></section>
- <section class="card"><h2>مهام المبنى</h2><div id="tk"></div></section>
- <section class="card"><h2>إزاي تقرا الصفحة</h2>
-  <div class="lg2"><span>من الأدمن: شريط جانبي بلون صاحب المهمة، وشبابيك فاضية في الدور</span><span class="s2">ضافها صاحبها: إطار وتظليل كامل، وشبابيك مليانة في الدور</span></div>
-  <p class="mu">العضو بيعلّم مهامه هو بس ويقدر يطلب مهمة من حد تاني، والأدمن بينقل المهام ويصفّر المبنى. لو فيه مهام مفتوحة الونش شغال وبلون كامل، ولو مفيش الونش بيقف والمبنى بيبهت.</p></section>
+ <section class="card" id="rvc" hidden><div id="rv"></div></section>
+ <section class="card"><div class="add"><input id="ti" placeholder="المهمة" maxlength="120" onkeydown="if(event.key==='Enter')add()"><select id="ow" aria-label="لمين"></select><button class="p" onclick="add()" aria-label="إضافة">+</button></div><div id="tk"></div></section>
  <section class="card" id="rq" hidden></section>
- <section class="card" id="ad" hidden><h2>إعدادات الأدمن</h2>
-  <div class="row"><label>مباني في البلوك <input id="c1" type="number" min="1" max="50" style="width:70px"></label><label>بلوكات في المدينة <input id="c2" type="number" min="1" max="50" style="width:70px"></label><button onclick="cfg()">حفظ</button></div>
-  <p></p><button class="p" onclick="rs=1;draw()">تصفير المبنى</button><div id="rv"></div></section>
+ <section class="card" id="ad" hidden>
+  <details class="s" id="as"><summary>إعدادات</summary>
+  <div class="row"><label>مباني/بلوك <input id="c1" type="number" min="1" max="50" style="width:70px"></label><label>بلوكات/مدينة <input id="c2" type="number" min="1" max="50" style="width:70px"></label><button onclick="cfg()">حفظ</button></div>
+  <p></p><button onclick="rs=1;draw()">تصفير</button></details></section>
 </div>
 <script>
 const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp35IAcgzNqZBGkDNJlmKAL2Q_eJX8GdRhDz_YKb/exec';
@@ -64,7 +72,7 @@ const nm=k=>W[k][0],co=k=>W[k][1];
 let me,code,st,adm,raw='',rs=0,dec={},cf={};
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 $('ow').innerHTML=K.map(k=>`<option value="${k}">${nm(k)}</option>`).join('');
-function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k))}
+function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 async function call(a,x={}){
  try{
   $('sy').textContent='…';
@@ -74,11 +82,11 @@ async function call(a,x={}){
   adm=j.role==='admin';
   const s=JSON.stringify(j.st);if(s!==raw){raw=s;st=j.st;draw()}
   $('sy').textContent='●';return j;
- }catch(e){$('sy').textContent='✕';return{ok:false,err:'مفيش اتصال بالسيرفر'}}
+ }catch(e){$('sy').textContent='✕';return{ok:false,err:'مفيش اتصال'}}
 }
 const go=async(a,x)=>{const j=await call(a,x);if(!j.ok)alert(j.err);return j};
 async function login(){
- if(!me)return $('le').textContent='اختار اسمك الأول';
+ if(!me)return $('le').textContent='اختار اسمك';
  code=$('code').value.trim();$('le').textContent='';
  const j=await call('get');
  if(!j.ok)return $('le').textContent=j.err||'حصل خطأ';
@@ -98,7 +106,7 @@ const dn=id=>go('done',{id}),mv=(id,to)=>go('move',{id,to}),rq=id=>go('req',{id}
 const cfg=()=>go('cfg',{bpb:+$('c1').value,bpc:+$('c2').value});
 const dc=(id,v)=>{dec[id]=v;draw()};
 async function fin(){
- if(!confirm('تقفل المبنى ده نهائيًا؟'))return;
+ if(!confirm('تقفل المبنى؟'))return;
  const j=await go('reset',{dec});
  if(j.ok){rs=0;dec={};cf={};draw()}
 }
@@ -117,29 +125,28 @@ function sky(cl,per,c){
  return `<div style="overflow-x:auto;margin-top:10px"><svg viewBox="0 0 ${x} 52" style="height:52px;min-width:${x}px;display:block">${r}</svg></div>`;
 }
 function rpanel(op){
- const all=op.every(t=>cf[t.id]);
- return '<p class="mu">اختار لكل مهمة مفتوحة مصيرها وأكّدها، وبعدين التصفير النهائي يتفتح.</p>'+op.map(t=>`<div class="t"><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}</div></div>`+(cf[t.id]?`<span class="mu">✔ ${dec[t.id]=='carry'?'اتنقلت للجاي':'اتلغت'} <button onclick="delete cf[${t.id}];draw()">تراجع</button></span>`:`<span class="row ch"><button class="${dec[t.id]=='carry'?'on':''}" onclick="dc(${t.id},'carry')">انقلها للجاي</button><button class="${dec[t.id]=='cancel'?'on':''}" onclick="dc(${t.id},'cancel')">الغيها</button><button class="p" ${dec[t.id]?'':'disabled'} onclick="cf[${t.id}]=1;draw()">تأكيد</button></span>`)+'</div>').join('')+
- `<p class="row"><button class="p" ${all?'':'disabled'} onclick="fin()">تصفير نهائي</button><button onclick="rs=0;dec={};cf={};draw()">إلغاء</button></p>`;
+ const all=op.every(t=>dec[t.id]);
+ return '<h2>المبنى '+st.cur+'</h2>'+op.map(t=>`<div class="t rr"><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}</div></div><div class="ch2"><button class="${dec[t.id]=='carry'?'on':''}" onclick="dc(${t.id},'carry')">للجاي</button><button class="${dec[t.id]=='cancel'?'on':''}" onclick="dc(${t.id},'cancel')">إلغاء</button></div></div>`).join('')+
+ `<div class="ch2" style="margin-top:10px"><button class="p" ${all?'':'disabled'} onclick="fin()">تصفير</button><button onclick="rs=0;dec={};cf={};draw()">رجوع</button></div>`;
 }
 function draw(){
  const c=st.cfg,cur=st.cur,cl=cur-1,per=c.bpb*c.bpc,ic=cl%per,cities=Math.floor(cl/per);
  const mine=st.tasks.filter(t=>t.b===cur),d=mine.filter(t=>t.s==='done').sort((a,b)=>a.d-b.d),op=mine.filter(t=>t.s==='open');
- $('stg').innerHTML=`<div class="md ${op.length?'':'idle'}" role="status"><i></i>${op.length?`وضع العمل: الونش شغال، فاضل ${op.length} مهمة`:'وضع التوقف: مفيش مهام مفتوحة، الونش واقف'}</div>`+svg(d.map(t=>({c:co(t.owner),a:t.by==='admin'})),op.length)+
-  `<div class="row" style="justify-content:space-between"><b>المبنى ${cur}</b><span class="mu">${d.length} دور · ${op.length} مهمة مفتوحة</span></div>`+
-  `<div class="mu">بلوك ${Math.floor(ic/c.bpb)+1} من ${c.bpc} · مبنى ${ic%c.bpb+1} من ${c.bpb} · مدينة ${cities+1}${cities?` · مدن مكتملة ${cities}`:''}</div>`+sky(cl,per,c)+`<div class="wk">${K.map(k=>{const a=mine.filter(t=>t.owner===k),o=a.filter(t=>t.s==='open').length;return `<span class="${o?'':'z'}"><i class="dot" style="background:${co(k)}"></i>${nm(k)} ${a.length-o}/${a.length}</span>`}).join('')}</div>`+(op.length==0&&d.length?`<div class="cl">كل مهام المبنى خلصت. ${adm?'دوس «تصفير المبنى» من إعدادات الأدمن عشان تقفله وتفتح اللي بعده.':'مستنيين الأدمن يصفّر المبنى ويفتح اللي بعده.'}</div>`:'')+(cur>1&&!d.length?`<div class="cl">مبنى ${cur-1} اتقفل، ومبنى ${cur} اتفتح.</div>`:'');
+ $('stg').innerHTML=`<div class="md ${op.length?'':'idle'}" role="status"><i></i>${op.length?`${op.length} مفتوحة`:'واقف'}</div>`+svg(d.map(t=>({c:co(t.owner),a:t.by==='admin'})),op.length)+
+  `<div class="row" style="justify-content:space-between"><b>المبنى ${cur}</b><span class="mu">بلوك ${Math.floor(ic/c.bpb)+1}/${c.bpc} · مبنى ${ic%c.bpb+1}/${c.bpb}${cities?` · مدينة ${cities+1}`:''}</span></div>`+sky(cl,per,c)+`<div class="wk">${K.map(k=>{const a=mine.filter(t=>t.owner===k),o=a.filter(t=>t.s==='open').length;return `<span class="${o?'':'z'}"><i class="dot" style="background:${co(k)}"></i>${nm(k)} ${a.length-o}/${a.length}</span>`}).join('')}</div>`+(op.length==0&&d.length?`<div class="cl row" style="justify-content:space-between"><span>خلصت</span>${adm?'<button class="p" onclick="rs=1;draw()">قفّل</button>':''}</div>`:'');
  $('tk').innerHTML=[...op,...d].map(t=>{
   const own=t.owner===me,pend=st.reqs.some(r=>r.tid===t.id&&r.to===me);
-  return `<div class="t${t.s==='done'?' d':''} ${t.by==='admin'?'ad':'sf'}" style="--oc:${co(t.owner)}"><i class="dot" style="background:${co(t.owner)}"></i><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}${t.by==='admin'?' <span class="b">من الأدمن</span>':''}</div></div>`+
-  (own?`<button onclick="dn(${t.id})">${t.s==='done'?'تراجع':'تمّت ✔'}</button>`:'')+
-  (adm&&t.s==='open'?`<select onchange="mv(${t.id},this.value)"><option>نقل إلى…</option>${K.filter(k=>k!==t.owner).map(k=>`<option value="${k}">${nm(k)}</option>`).join('')}</select>`:'')+
-  (!adm&&!own&&t.s==='open'?`<button ${pend?'disabled':''} onclick="rq(${t.id})">${pend?'اتطلبت':'اطلبها ليّا'}</button>`:'')+'</div>';
- }).join('')||'<p class="mu">مفيش مهام في المبنى ده. ضيف أول مهمة.</p>';
+  return `<div class="t${t.s==='done'?' d':''} ${t.by==='admin'?'ad':'sf'}" style="--oc:${co(t.owner)}"><i class="dot" style="background:${co(t.owner)}"></i><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}${t.by==='admin'?' <span class="b">أدمن</span>':''}</div></div>`+
+  (own?`<button onclick="dn(${t.id})">${t.s==='done'?'تراجع':'✔'}</button>`:'')+
+  (adm&&t.s==='open'?`<select onchange="mv(${t.id},this.value)"><option>⇄</option>${K.filter(k=>k!==t.owner).map(k=>`<option value="${k}">${nm(k)}</option>`).join('')}</select>`:'')+
+  (!adm&&!own&&t.s==='open'?`<button ${pend?'disabled':''} onclick="rq(${t.id})">${pend?'اتطلبت':'اطلبها'}</button>`:'')+'</div>';
+ }).join('')||'<p class="mu">مفيش مهام</p>';
  if(adm){
   $('rq').hidden=!st.reqs.length;
-  $('rq').innerHTML=st.reqs.length?'<h2>طلبات النقل</h2>'+st.reqs.map(r=>{const t=st.tasks.find(x=>x.id===r.tid);return `<div class="t"><div class="n">${nm(r.to)} عايز «${E(t.title)}» (عند ${nm(t.owner)})</div><button class="p" onclick="rr(${r.id},1)">موافقة</button><button onclick="rr(${r.id},0)">رفض</button></div>`}).join(''):'';
+  $('rq').innerHTML=st.reqs.length?'<h2>طلبات</h2>'+st.reqs.map(r=>{const t=st.tasks.find(x=>x.id===r.tid);return `<div class="t"><div class="n">${nm(r.to)} يطلب «${E(t.title)}»</div><button class="p" onclick="rr(${r.id},1)">موافقة</button><button onclick="rr(${r.id},0)">رفض</button></div>`}).join(''):'';
   if(document.activeElement!==$('c1'))$('c1').value=c.bpb;
   if(document.activeElement!==$('c2'))$('c2').value=c.bpc;
-  $('rv').innerHTML=rs?rpanel(op):'';
+  $('rvc').hidden=!rs;$('rv').innerHTML=rs?rpanel(op):'';
  }
 }
 try{const s=JSON.parse(localStorage.getItem('sb'));if(s){pick(s[0]);$('code').value=s[1];login()}}catch(e){}
