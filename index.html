@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sunud Building</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e1525;--cd:#16203a;--tx:#e8edf7;--mu:#8b97b3;--ln:#26345a;--ac:#e8b04b}
+*{box-sizing:border-box}
+body{margin:0 auto;max-width:560px;padding:12px;background:var(--bg);color:var(--tx);font:16px/1.6 Tajawal,system-ui,Tahoma,sans-serif}
+h1{font-size:20px;margin:0}h2{font-size:15px;color:var(--mu);margin:0 0 10px}
+.card{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:12px}
+input,select,button{font:inherit;color:var(--tx);background:#0e1730;border:1px solid var(--ln);border-radius:10px;padding:8px 12px}
+button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac)}
+button.p,.ch button.on{background:var(--ac);color:#1a1405;border-color:var(--ac);font-weight:700}
+button:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;border:1px solid #ffffff66}
+.t{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:9px 0;border-top:1px solid var(--ln)}
+.t:first-child{border-top:0}.t .n{flex:1;min-width:140px;overflow-wrap:anywhere}
+.t.d .n{text-decoration:line-through;color:var(--mu)}
+.b{font-size:11px;color:var(--ac);border:1px solid var(--ac);border-radius:8px;padding:0 6px}
+.mu{color:var(--mu);font-size:13px}
+.ch button{display:inline-flex;gap:6px;align-items:center}
+.crane{opacity:.22;filter:grayscale(1)}.crane.on{opacity:1;filter:none}
+.crane.on .hk{animation:sw 5s ease-in-out infinite}
+@keyframes sw{50%{transform:translateX(-70px)}}
+@media(prefers-reduced-motion:reduce){.crane.on .hk{animation:none}}
+</style></head><body>
+<div id="lg" class="card">
+ <h1>Sunud Building</h1><p class="mu">اختار اسمك وادخل رمز الفريق</p>
+ <div class="row ch" id="names"></div><p></p>
+ <div class="row"><input id="code" type="password" placeholder="الرمز" autocomplete="off"><button class="p" onclick="login()">دخول</button></div>
+ <p id="le" class="mu"></p>
+</div>
+<div id="mn" hidden>
+ <div class="top"><div><h1>Sunud Building</h1><span class="mu" id="who"></span></div><div class="row"><span id="sy" class="mu">●</span><button onclick="out()">خروج</button></div></div>
+ <section class="card" id="stg"></section>
+ <section class="card"><h2>مهمة جديدة</h2><div class="row"><input id="ti" placeholder="اكتب المهمة" maxlength="120" style="flex:1;min-width:150px"><select id="ow"></select><button class="p" onclick="add()">إضافة</button></div></section>
+ <section class="card"><h2>مهام المبنى</h2><div id="tk"></div></section>
+ <section class="card" id="rq" hidden></section>
+ <section class="card" id="ad" hidden><h2>إعدادات الأدمن</h2>
+  <div class="row"><label>مباني في البلوك <input id="c1" type="number" min="1" max="50" style="width:70px"></label><label>بلوكات في المدينة <input id="c2" type="number" min="1" max="50" style="width:70px"></label><button onclick="cfg()">حفظ</button></div>
+  <p></p><button class="p" onclick="rs=1;draw()">تصفير المبنى</button><div id="rv"></div></section>
+</div>
+<script>
+const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp35IAcgzNqZBGkDNJlmKAL2Q_eJX8GdRhDz_YKb/exec';
+const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
+const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const nm=k=>W[k][0],co=k=>W[k][1];
+let me,code,st,adm,raw='',rs=0,dec={},cf={};
+$('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
+$('ow').innerHTML=K.map(k=>`<option value="${k}">${nm(k)}</option>`).join('');
+function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k))}
+async function call(a,x={}){
+ try{
+  $('sy').textContent='…';
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});
+  const j=await r.json();
+  if(!j.ok){$('sy').textContent='!';return j}
+  adm=j.role==='admin';
+  const s=JSON.stringify(j.st);if(s!==raw){raw=s;st=j.st;draw()}
+  $('sy').textContent='●';return j;
+ }catch(e){$('sy').textContent='✕';return{ok:false,err:'مفيش اتصال بالسيرفر'}}
+}
+const go=async(a,x)=>{const j=await call(a,x);if(!j.ok)alert(j.err);return j};
+async function login(){
+ if(!me)return $('le').textContent='اختار اسمك الأول';
+ code=$('code').value.trim();$('le').textContent='';
+ const j=await call('get');
+ if(!j.ok)return $('le').textContent=j.err||'حصل خطأ';
+ try{localStorage.setItem('sb',JSON.stringify([me,code]))}catch(e){}
+ $('lg').hidden=1;$('mn').hidden=0;
+ $('who').textContent=nm(me)+(adm?' · أدمن':'');
+ $('ow').hidden=!adm;$('ow').value=me;$('ad').hidden=!adm;
+ setInterval(()=>{if(!document.hidden)call('get')},15000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)call('get')});
+}
+function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
+async function add(){
+ const t=$('ti').value.trim();if(!t)return;
+ const j=await go('add',{title:t,owner:adm?$('ow').value:me});if(j.ok)$('ti').value='';
+}
+const dn=id=>go('done',{id}),mv=(id,to)=>go('move',{id,to}),rq=id=>go('req',{id}),rr=(id,ok)=>go('res',{id,ok});
+const cfg=()=>go('cfg',{bpb:+$('c1').value,bpc:+$('c2').value});
+const dc=(id,v)=>{dec[id]=v;draw()};
+async function fin(){
+ if(!confirm('تقفل المبنى ده نهائيًا؟'))return;
+ const j=await go('reset',{dec});
+ if(j.ok){rs=0;dec={};cf={};draw()}
+}
+function svg(f,o){
+ const n=f.length,h=Math.min(18,150/Math.max(n,1)),hy=Math.max(52,220-n*h-16);
+ return `<svg viewBox="0 0 300 240" style="width:100%;display:block"><rect x="20" y="222" width="260" height="4" rx="2" fill="#26345a"/><rect x="80" y="60" width="120" height="160" rx="3" fill="none" stroke="#3a4a78" stroke-dasharray="5 4"/>`+
+ f.map((c,i)=>`<rect x="80" y="${220-(i+1)*h}" width="120" height="${h-2}" rx="2" fill="${c}"/>`).join('')+
+ `<g class="crane${o?' on':''}"><rect x="228" y="36" width="8" height="186" fill="#e8b04b"/><rect x="90" y="36" width="160" height="6" fill="#e8b04b"/><rect x="236" y="30" width="20" height="14" fill="#8b97b3"/><g class="hk"><line x1="180" y1="42" x2="180" y2="${hy}" stroke="#cfd6e6"/><rect x="174" y="${hy}" width="12" height="8" fill="#e8b04b"/></g></g></svg>`;
+}
+function sky(cl,per,c){
+ const s=Math.floor(cl/per)*per;if(cl<=s)return'';
+ const bs=[];for(let k=s+1;k<=cl;k++)bs.push(st.tasks.filter(t=>t.b===k&&t.s==='done').sort((a,b)=>a.d-b.d));
+ const m=Math.max(1,...bs.map(a=>a.length)),h=Math.min(5,46/m);let x=0,r='';
+ bs.forEach((a,i)=>{if(i&&i%c.bpb===0)x+=10;a.forEach((t,j)=>r+=`<rect x="${x}" y="${50-(j+1)*h}" width="12" height="${h-1}" fill="${co(t.owner)}"/>`);x+=16});
+ return `<div style="overflow-x:auto;margin-top:10px"><svg viewBox="0 0 ${x} 52" style="height:52px;min-width:${x}px;display:block">${r}</svg></div>`;
+}
+function rpanel(op){
+ const all=op.every(t=>cf[t.id]);
+ return '<p class="mu">اختار لكل مهمة مفتوحة مصيرها وأكّدها، وبعدين التصفير النهائي يتفتح.</p>'+op.map(t=>`<div class="t"><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}</div></div>`+(cf[t.id]?`<span class="mu">✔ ${dec[t.id]=='carry'?'اتنقلت للجاي':'اتلغت'}</span>`:`<span class="row ch"><button class="${dec[t.id]=='carry'?'on':''}" onclick="dc(${t.id},'carry')">انقلها للجاي</button><button class="${dec[t.id]=='cancel'?'on':''}" onclick="dc(${t.id},'cancel')">الغيها</button><button class="p" ${dec[t.id]?'':'disabled'} onclick="cf[${t.id}]=1;draw()">تأكيد</button></span>`)+'</div>').join('')+
+ `<p class="row"><button class="p" ${all?'':'disabled'} onclick="fin()">تصفير نهائي</button><button onclick="rs=0;dec={};cf={};draw()">إلغاء</button></p>`;
+}
+function draw(){
+ const c=st.cfg,cur=st.cur,cl=cur-1,per=c.bpb*c.bpc,ic=cl%per,cities=Math.floor(cl/per);
+ const mine=st.tasks.filter(t=>t.b===cur),d=mine.filter(t=>t.s==='done').sort((a,b)=>a.d-b.d),op=mine.filter(t=>t.s==='open');
+ $('stg').innerHTML=svg(d.map(t=>co(t.owner)),op.length)+
+  `<div class="row" style="justify-content:space-between"><b>المبنى ${cur}</b><span class="mu">${d.length} دور · ${op.length} مهمة مفتوحة</span></div>`+
+  `<div class="mu">بلوك ${Math.floor(ic/c.bpb)+1} من ${c.bpc} · مبنى ${ic%c.bpb+1} من ${c.bpb} · مدينة ${cities+1}${cities?` · مدن مكتملة ${cities}`:''}</div>`+sky(cl,per,c);
+ $('tk').innerHTML=[...op,...d].map(t=>{
+  const own=t.owner===me,pend=st.reqs.some(r=>r.tid===t.id&&r.to===me);
+  return `<div class="t${t.s==='done'?' d':''}"><i class="dot" style="background:${co(t.owner)}"></i><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}${t.by==='admin'?' <span class="b">من الأدمن</span>':''}</div></div>`+
+  (own?`<button onclick="dn(${t.id})">${t.s==='done'?'تراجع':'تمّت ✔'}</button>`:'')+
+  (adm&&t.s==='open'?`<select onchange="mv(${t.id},this.value)"><option>نقل إلى…</option>${K.filter(k=>k!==t.owner).map(k=>`<option value="${k}">${nm(k)}</option>`).join('')}</select>`:'')+
+  (!adm&&!own&&t.s==='open'?`<button ${pend?'disabled':''} onclick="rq(${t.id})">${pend?'اتطلبت':'اطلبها ليّا'}</button>`:'')+'</div>';
+ }).join('')||'<p class="mu">مفيش مهام في المبنى ده. ضيف أول مهمة.</p>';
+ if(adm){
+  $('rq').hidden=!st.reqs.length;
+  $('rq').innerHTML=st.reqs.length?'<h2>طلبات النقل</h2>'+st.reqs.map(r=>{const t=st.tasks.find(x=>x.id===r.tid);return `<div class="t"><div class="n">${nm(r.to)} عايز «${E(t.title)}» (عند ${nm(t.owner)})</div><button class="p" onclick="rr(${r.id},1)">موافقة</button><button onclick="rr(${r.id},0)">رفض</button></div>`}).join(''):'';
+  if(document.activeElement!==$('c1'))$('c1').value=c.bpb;
+  if(document.activeElement!==$('c2'))$('c2').value=c.bpc;
+  $('rv').innerHTML=rs?rpanel(op):'';
+ }
+}
+try{const s=JSON.parse(localStorage.getItem('sb'));if(s){pick(s[0]);$('code').value=s[1];login()}}catch(e){}
+</script></body></html>
