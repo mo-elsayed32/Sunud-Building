@@ -136,7 +136,7 @@ function draw(){
   `<div class="row" style="justify-content:space-between"><b>المبنى ${cur}</b><span class="mu">بلوك ${Math.floor(ic/c.bpb)+1}/${c.bpc} · مبنى ${ic%c.bpb+1}/${c.bpb}${cities?` · مدينة ${cities+1}`:''}</span></div>`+sky(cl,per,c)+`<div class="wk">${K.map(k=>{const a=mine.filter(t=>t.owner===k),o=a.filter(t=>t.s==='open').length;return `<span class="${o?'':'z'}"><i class="dot" style="background:${co(k)}"></i>${nm(k)} ${a.length-o}/${a.length}</span>`}).join('')}</div>`+(op.length==0&&d.length?`<div class="cl row" style="justify-content:space-between"><span>خلصت</span>${adm?'<button class="p" onclick="rs=1;draw()">قفّل</button>':''}</div>`:'');
  $('tk').innerHTML=[...op,...d].map(t=>{
   const own=t.owner===me,pend=st.reqs.some(r=>r.tid===t.id&&r.to===me);
-  return `<div class="t${t.s==='done'?' d':''} ${t.by==='admin'?'ad':'sf'}" style="--oc:${co(t.owner)}"><i class="dot" style="background:${co(t.owner)}"></i><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}${t.by==='admin'?' <span class="b">أدمن</span>':''}</div></div>`+
+  return `<div class="t${t.s==='done'?' d':''} ${t.by==='admin'?'ad':'sf'}" style="--oc:${co(t.owner)}"><i class="dot" style="background:${co(t.owner)}"></i><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}</div></div>`+
   (own?`<button onclick="dn(${t.id})">${t.s==='done'?'تراجع':'✔'}</button>`:'')+
   (adm&&t.s==='open'?`<select onchange="mv(${t.id},this.value)"><option>⇄</option>${K.filter(k=>k!==t.owner).map(k=>`<option value="${k}">${nm(k)}</option>`).join('')}</select>`:'')+
   (!adm&&!own&&t.s==='open'?`<button ${pend?'disabled':''} onclick="rq(${t.id})">${pend?'اتطلبت':'اطلبها'}</button>`:'')+'</div>';
