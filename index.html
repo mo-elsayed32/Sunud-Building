@@ -204,6 +204,19 @@ body:has(.fab) .nav{padding-left:90px}
 @media(min-width:900px){.fab{left:calc(50% - 260px - 84px)}body:has(.fab) .nav{padding-left:12px}}
 .sh{background:var(--sf);border-radius:32px 32px 0 0}
 .tl{background:#ffffff08;border-radius:16px;box-shadow:none}.tl.cu{box-shadow:inset 0 0 0 1.5px var(--ac)}
+/* v5 personal + team */
+.mine{padding:16px 18px}.mine .v{font-weight:700;font-size:15px}.mine .bar{margin:12px 0 0}
+.flat .tm{display:flex;flex-direction:column;gap:2px}
+.tm .th{display:flex;align-items:center;gap:10px;width:100%;min-height:60px;background:#ffffff07;border-radius:10px;padding:10px 14px;text-align:start;box-shadow:none}
+.tm .th b{font-weight:600;font-size:15px}.tm .th .mu{margin-inline-start:2px}
+.tm .th .bar{flex:1;margin:0;max-width:90px;margin-inline-start:auto}.tm .th .chv{color:var(--mu);font-size:16px;width:20px;text-align:center}
+.tm:first-child .th{border-radius:26px 26px 10px 10px}.tm:last-child .th{border-radius:10px 10px 26px 26px}.tm:only-child .th{border-radius:26px}
+.tm .tb{display:flex;flex-direction:column;gap:2px;padding:0 0 4px 0}
+.tm .tb .t{background:#ffffff0b;border-radius:10px!important;margin:0 8px}
+.flat.teamc{padding:6px}
+.flat>.rq{background:#e9b44c1f;border-radius:26px 26px 10px 10px;margin:0 0 2px;padding:8px 8px 8px 16px;min-height:48px;color:var(--ac);font-weight:600;font-size:14px;align-items:center}
+.flat>.rq+.tm .th{border-radius:10px}
+.flat>.rq+.tm:last-child .th{border-radius:10px 10px 26px 26px}
 </style></head><body>
 <div id="lg" class="card">
  <h1>Sunud Building</h1>
@@ -222,7 +235,7 @@ const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp
 const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
 const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const nm=k=>W[k][0],co=k=>W[k][1];
-let me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
+let opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
@@ -318,15 +331,29 @@ function tasks(ts,ro){
   if(!a&&t.s==='done')a='<i class="ckd">✓</i>';
   return `<div class="t${t.s==='done'?' d':''}" style="--oc:${co(t.owner)}"><div class="n">${E(t.title)}<span class="mu">${nm(t.owner)}${t.dq?` · <b class="dq">بانتظار المسح · ${dleft(t)} يوم</b>`:''}</span></div>${a}</div>`}).join('');
 }
-function home(){
- const c=st.cfg,cur=st.cur,vb=viewB||cur,ts=byB(vb),live=vb===cur,o=ts.filter(t=>t.s==='open').length,d=ts.length-o;
- const cl=vb-1,per=c.bpb*c.bpc,ic=cl%per,cities=Math.floor(cl/per);
+const own1=(ts,k)=>{const a=ts.filter(t=>t.owner===k),dn=a.filter(t=>t.s==='done').length;return{a,dn,p:a.length?Math.round(dn/a.length*100):0}};
+function scn(ts,vb,live,o){
+ const c=st.cfg,cl=vb-1,per=c.bpb*c.bpc,ic=cl%per,cities=Math.floor(cl/per);
  const state=!ts.length?(live?'واقف':'فاضي'):o?`${o} مفتوحة`:'اكتمل البناء';
- return `<div class="home"><div class="l"><section class="card sc ${o?'':'idle'}">${scene(ts,live)}
+ return `<section class="card sc ${o?'':'idle'}">${scene(ts,live)}
   <div class="cap"><div><div class="mu">مبنى ${vb}${live?'':' · مقفول'}</div><div class="big">${state}</div><div class="mu">بلوك ${Math.floor(ic/c.bpb)+1}/${c.bpc} · مبنى ${ic%c.bpb+1}/${c.bpb}${cities?' · مدينة '+(cities+1):''}</div></div>
-  <div class="nv"><button onclick="nav(-1)" ${vb<=1?'disabled':''} aria-label="السابق">›</button><button onclick="nav(1)" ${live?'disabled':''} aria-label="التالي">‹</button></div></div></section>
-  <section class="card mbc">${members(ts)}</section></div>
-  <div class="r"><section class="flat">${(st.reqs.length+dqs().length)&&adm?`<div class="row sp"><span>طلبات</span><button class="p" onclick="setTab('s')">${st.reqs.length+dqs().length}</button></div>`:''}${tasks(ts,!live)}</section></div></div>`;
+  <div class="nv"><button onclick="nav(-1)" ${vb<=1?'disabled':''} aria-label="السابق">›</button><button onclick="nav(1)" ${live?'disabled':''} aria-label="التالي">‹</button></div></div></section>`;
+}
+function home(){
+ const cur=st.cur,vb=viewB||cur,ts=byB(vb),live=vb===cur,o=ts.filter(t=>t.s==='open').length;
+ const m=own1(ts,me),mine=ts.filter(t=>t.owner===me);
+ return `<div class="home"><div class="l">${scn(ts,vb,live,o)}
+  <section class="card mine"><div class="row sp"><span class="row" style="gap:8px"><i class="dot" style="background:${co(me)}"></i><b>مهامي</b></span><span class="v">${m.a.length?m.dn+'/'+m.a.length:'—'}</span></div><div class="bar"><i style="width:${m.p}%;background:${co(me)}"></i></div></section></div>
+  <div class="r"><section class="flat">${tasks(mine,!live)}</section></div></div>`;
+}
+const tg=k=>{opn[k]=!opn[k];draw()};
+function team(){
+ const cur=st.cur,vb=viewB||cur,ts=byB(vb),live=vb===cur,o=ts.filter(t=>t.s==='open').length;
+ const list=adm?K:K.filter(k=>k!==me);
+ const req=(st.reqs.length+dqs().length)&&adm?`<div class="row sp rq"><span>طلبات</span><button class="p" onclick="setTab('s')">${st.reqs.length+dqs().length}</button></div>`:'';
+ const cards=list.map(k=>{const m=own1(ts,k),op=!!opn[k],mt=ts.filter(t=>t.owner===k);
+  return `<div class="tm"><button class="th" onclick="tg('${k}')" aria-expanded="${op}"><i class="dot" style="background:${co(k)}"></i><b>${nm(k)}</b><span class="mu">${m.a.length?m.dn+'/'+m.a.length:'—'}</span><span class="bar"><i style="width:${m.p}%;background:${co(k)}"></i></span><span class="chv">${op?'⌃':'⌄'}</span></button>${op?`<div class="tb">${tasks(mt,!live)}</div>`:''}</div>`}).join('');
+ return `<div class="home"><div class="l">${scn(ts,vb,live,o)}</div><div class="r"><section class="flat teamc">${req}${cards}</section></div></div>`;
 }
 function city(){
  const c=st.cfg,cur=st.cur,per=c.bpb*c.bpc,cl=cur-1,base=Math.floor(cl/per)*per,cities=Math.floor(cl/per);
@@ -359,11 +386,11 @@ function draw(){
  const keep=document.activeElement&&document.activeElement.id==='ti'?$('ti').value:null;
  $('me').innerHTML=`<i class="dot" style="background:${co(me)}"></i><b>${nm(me)}</b>${adm?'<span class="ad">أدمن</span>':''}`;
  if(!adm&&tab==='s')tab='h';
- const v=tab==='c'?city():tab==='s'?settings():home();
- const IC={h:'<path d="M5 20V8l7-4 7 4v12M9 20v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01"/>',c:'<path d="M3 20h18M5 20V10h5v10M10 20V5h5v15M15 20v-7h4v7"/>',s:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>'};
+ const v=tab==='c'?city():tab==='s'?settings():tab==='u'?team():home();
+ const IC={u:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.8-6 6-6s6 2.5 6 6M16 5.5a3 3 0 0 1 0 5.6M18 14.5c2 .8 3 2.6 3 5.5"/>',h:'<path d="M5 20V8l7-4 7 4v12M9 20v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01"/>',c:'<path d="M3 20h18M5 20V10h5v10M10 20V5h5v15M15 20v-7h4v7"/>',s:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>'};
  const nb=(k,l,b)=>`<button class="${tab===k?'a':''}" onclick="setTab('${k}')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><span>${l}</span>${b?`<span class="bd">${b}</span>`:''}</button>`;
  $('v').innerHTML=v;
- $('fb').innerHTML=(adm&&tab==='h'&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet&&adm?sheetUI():'')+`<div class="nav"><div>${nb('h','المبنى')}${nb('c','المدينة')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length):''}</div></div>`;
+ $('fb').innerHTML=(adm&&(tab==='h'||tab==='u')&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet&&adm?sheetUI():'')+`<div class="nav"><div>${nb('h','مهامي')}${nb('u','الفريق')}${nb('c','Building')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length):''}</div></div>`;
  if(keep!==null&&$('ti')){$('ti').value=keep;$('ti').focus()}
  seen=new Set(st.tasks.filter(t=>t.s==='done').map(t=>t.id));
 }
