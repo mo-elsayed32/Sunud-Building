@@ -23,6 +23,16 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .mu{color:var(--mu);font-size:13px}
 .ch button{display:inline-flex;gap:6px;align-items:center}
 .crane{opacity:.22;filter:grayscale(1)}.crane.on{opacity:1;filter:none}
+.bld{transition:opacity .3s}.bld.idle{opacity:.35;filter:grayscale(1)}
+.bc{animation:bk 1s ease-in-out infinite}@keyframes bk{50%{opacity:.25}}
+.md{display:flex;align-items:center;gap:8px;padding:6px 10px;margin-bottom:8px;border:1px solid var(--ln);border-radius:10px;font-size:14px}
+.md i{width:10px;height:10px;border-radius:50%;background:#22c55e;flex:none}.md.idle{color:var(--mu)}.md.idle i{background:var(--mu)}
+.wk{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.wk span{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--ln);border-radius:10px;padding:2px 8px;font-size:13px}.wk span.z{opacity:.4}
+.t.ad{border-inline-start:5px solid var(--oc);padding-inline-start:8px}
+.t.sf{border:2px solid var(--oc);border-radius:10px;padding-inline:8px;margin:4px 0;background:color-mix(in srgb,var(--oc) 14%,transparent)}
+.cl{border:1px solid var(--ac);border-radius:10px;padding:8px 10px;margin-top:10px;font-size:14px}
+.lg2{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.lg2 span{font-size:12px;padding:2px 8px;border-radius:8px;border:1px solid var(--mu)}.lg2 .s2{background:var(--mu);color:#0e1525}
+@media(prefers-reduced-motion:reduce){.bc{animation:none}}
 .crane.on .hk{animation:sw 5s ease-in-out infinite}
 @keyframes sw{50%{transform:translateX(-70px)}}
 @media(prefers-reduced-motion:reduce){.crane.on .hk{animation:none}}
@@ -38,6 +48,9 @@ button:disabled{opacity:.4;cursor:not-allowed}
  <section class="card" id="stg"></section>
  <section class="card"><h2>مهمة جديدة</h2><div class="row"><input id="ti" placeholder="اكتب المهمة" maxlength="120" style="flex:1;min-width:150px"><select id="ow"></select><button class="p" onclick="add()">إضافة</button></div></section>
  <section class="card"><h2>مهام المبنى</h2><div id="tk"></div></section>
+ <section class="card"><h2>إزاي تقرا الصفحة</h2>
+  <div class="lg2"><span>من الأدمن: شريط جانبي بلون صاحب المهمة، وشبابيك فاضية في الدور</span><span class="s2">ضافها صاحبها: إطار وتظليل كامل، وشبابيك مليانة في الدور</span></div>
+  <p class="mu">العضو بيعلّم مهامه هو بس ويقدر يطلب مهمة من حد تاني، والأدمن بينقل المهام ويصفّر المبنى. لو فيه مهام مفتوحة الونش شغال وبلون كامل، ولو مفيش الونش بيقف والمبنى بيبهت.</p></section>
  <section class="card" id="rq" hidden></section>
  <section class="card" id="ad" hidden><h2>إعدادات الأدمن</h2>
   <div class="row"><label>مباني في البلوك <input id="c1" type="number" min="1" max="50" style="width:70px"></label><label>بلوكات في المدينة <input id="c2" type="number" min="1" max="50" style="width:70px"></label><button onclick="cfg()">حفظ</button></div>
@@ -90,10 +103,11 @@ async function fin(){
  if(j.ok){rs=0;dec={};cf={};draw()}
 }
 function svg(f,o){
+ const fc=f.map(x=>x.c);
  const n=f.length,h=Math.min(18,150/Math.max(n,1)),hy=Math.max(52,220-n*h-16);
  return `<svg viewBox="0 0 300 240" style="width:100%;display:block"><rect x="20" y="222" width="260" height="4" rx="2" fill="#26345a"/><rect x="80" y="60" width="120" height="160" rx="3" fill="none" stroke="#3a4a78" stroke-dasharray="5 4"/>`+
- f.map((c,i)=>`<rect x="80" y="${220-(i+1)*h}" width="120" height="${h-2}" rx="2" fill="${c}"/>`).join('')+
- `<g class="crane${o?' on':''}"><rect x="228" y="36" width="8" height="186" fill="#e8b04b"/><rect x="90" y="36" width="160" height="6" fill="#e8b04b"/><rect x="236" y="30" width="20" height="14" fill="#8b97b3"/><g class="hk"><line x1="180" y1="42" x2="180" y2="${hy}" stroke="#cfd6e6"/><rect x="174" y="${hy}" width="12" height="8" fill="#e8b04b"/></g></g></svg>`;
+ `<g class="bld${o?'':' idle'}">`+f.map((x,i)=>{const y=220-(i+1)*h,w=h>=10?[92,132,172].map(wx=>`<rect x="${wx}" y="${y+4}" width="26" height="${h-10}" rx="1" ${x.a?'fill="none" stroke="#0e1525" stroke-width="1.5"':'fill="#0e1525" fill-opacity=".75"'}/>`).join(''):'';return `<rect x="80" y="${y}" width="120" height="${h-2}" rx="2" fill="${x.c}"/>`+w}).join('')+`</g>`+
+ `<g class="crane${o?' on':''}"><rect x="228" y="36" width="8" height="186" fill="#e8b04b"/><rect x="90" y="36" width="160" height="6" fill="#e8b04b"/><rect x="236" y="30" width="20" height="14" fill="#8b97b3"/>${o?'<circle class="bc" cx="232" cy="30" r="4" fill="#ef4444"/>':''}<g class="hk"><line x1="180" y1="42" x2="180" y2="${hy}" stroke="#cfd6e6"/><rect x="174" y="${hy}" width="12" height="8" fill="#e8b04b"/></g></g></svg>`;
 }
 function sky(cl,per,c){
  const s=Math.floor(cl/per)*per;if(cl<=s)return'';
@@ -104,18 +118,18 @@ function sky(cl,per,c){
 }
 function rpanel(op){
  const all=op.every(t=>cf[t.id]);
- return '<p class="mu">اختار لكل مهمة مفتوحة مصيرها وأكّدها، وبعدين التصفير النهائي يتفتح.</p>'+op.map(t=>`<div class="t"><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}</div></div>`+(cf[t.id]?`<span class="mu">✔ ${dec[t.id]=='carry'?'اتنقلت للجاي':'اتلغت'}</span>`:`<span class="row ch"><button class="${dec[t.id]=='carry'?'on':''}" onclick="dc(${t.id},'carry')">انقلها للجاي</button><button class="${dec[t.id]=='cancel'?'on':''}" onclick="dc(${t.id},'cancel')">الغيها</button><button class="p" ${dec[t.id]?'':'disabled'} onclick="cf[${t.id}]=1;draw()">تأكيد</button></span>`)+'</div>').join('')+
+ return '<p class="mu">اختار لكل مهمة مفتوحة مصيرها وأكّدها، وبعدين التصفير النهائي يتفتح.</p>'+op.map(t=>`<div class="t"><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}</div></div>`+(cf[t.id]?`<span class="mu">✔ ${dec[t.id]=='carry'?'اتنقلت للجاي':'اتلغت'} <button onclick="delete cf[${t.id}];draw()">تراجع</button></span>`:`<span class="row ch"><button class="${dec[t.id]=='carry'?'on':''}" onclick="dc(${t.id},'carry')">انقلها للجاي</button><button class="${dec[t.id]=='cancel'?'on':''}" onclick="dc(${t.id},'cancel')">الغيها</button><button class="p" ${dec[t.id]?'':'disabled'} onclick="cf[${t.id}]=1;draw()">تأكيد</button></span>`)+'</div>').join('')+
  `<p class="row"><button class="p" ${all?'':'disabled'} onclick="fin()">تصفير نهائي</button><button onclick="rs=0;dec={};cf={};draw()">إلغاء</button></p>`;
 }
 function draw(){
  const c=st.cfg,cur=st.cur,cl=cur-1,per=c.bpb*c.bpc,ic=cl%per,cities=Math.floor(cl/per);
  const mine=st.tasks.filter(t=>t.b===cur),d=mine.filter(t=>t.s==='done').sort((a,b)=>a.d-b.d),op=mine.filter(t=>t.s==='open');
- $('stg').innerHTML=svg(d.map(t=>co(t.owner)),op.length)+
+ $('stg').innerHTML=`<div class="md ${op.length?'':'idle'}" role="status"><i></i>${op.length?`وضع العمل: الونش شغال، فاضل ${op.length} مهمة`:'وضع التوقف: مفيش مهام مفتوحة، الونش واقف'}</div>`+svg(d.map(t=>({c:co(t.owner),a:t.by==='admin'})),op.length)+
   `<div class="row" style="justify-content:space-between"><b>المبنى ${cur}</b><span class="mu">${d.length} دور · ${op.length} مهمة مفتوحة</span></div>`+
-  `<div class="mu">بلوك ${Math.floor(ic/c.bpb)+1} من ${c.bpc} · مبنى ${ic%c.bpb+1} من ${c.bpb} · مدينة ${cities+1}${cities?` · مدن مكتملة ${cities}`:''}</div>`+sky(cl,per,c);
+  `<div class="mu">بلوك ${Math.floor(ic/c.bpb)+1} من ${c.bpc} · مبنى ${ic%c.bpb+1} من ${c.bpb} · مدينة ${cities+1}${cities?` · مدن مكتملة ${cities}`:''}</div>`+sky(cl,per,c)+`<div class="wk">${K.map(k=>{const a=mine.filter(t=>t.owner===k),o=a.filter(t=>t.s==='open').length;return `<span class="${o?'':'z'}"><i class="dot" style="background:${co(k)}"></i>${nm(k)} ${a.length-o}/${a.length}</span>`}).join('')}</div>`+(op.length==0&&d.length?`<div class="cl">كل مهام المبنى خلصت. ${adm?'دوس «تصفير المبنى» من إعدادات الأدمن عشان تقفله وتفتح اللي بعده.':'مستنيين الأدمن يصفّر المبنى ويفتح اللي بعده.'}</div>`:'')+(cur>1&&!d.length?`<div class="cl">مبنى ${cur-1} اتقفل، ومبنى ${cur} اتفتح.</div>`:'');
  $('tk').innerHTML=[...op,...d].map(t=>{
   const own=t.owner===me,pend=st.reqs.some(r=>r.tid===t.id&&r.to===me);
-  return `<div class="t${t.s==='done'?' d':''}"><i class="dot" style="background:${co(t.owner)}"></i><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}${t.by==='admin'?' <span class="b">من الأدمن</span>':''}</div></div>`+
+  return `<div class="t${t.s==='done'?' d':''} ${t.by==='admin'?'ad':'sf'}" style="--oc:${co(t.owner)}"><i class="dot" style="background:${co(t.owner)}"></i><div class="n">${E(t.title)}<div class="mu">${nm(t.owner)}${t.by==='admin'?' <span class="b">من الأدمن</span>':''}</div></div>`+
   (own?`<button onclick="dn(${t.id})">${t.s==='done'?'تراجع':'تمّت ✔'}</button>`:'')+
   (adm&&t.s==='open'?`<select onchange="mv(${t.id},this.value)"><option>نقل إلى…</option>${K.filter(k=>k!==t.owner).map(k=>`<option value="${k}">${nm(k)}</option>`).join('')}</select>`:'')+
   (!adm&&!own&&t.s==='open'?`<button ${pend?'disabled':''} onclick="rq(${t.id})">${pend?'اتطلبت':'اطلبها ليّا'}</button>`:'')+'</div>';
