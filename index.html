@@ -229,6 +229,10 @@ body:has(.fab) .nav{padding-left:90px}
 .mb.me{align-self:flex-start;background:var(--ac);color:#1a1405}
 .mw{font-size:11px;font-weight:700}.mx{font-size:15px;white-space:pre-wrap;word-break:break-word}.mt{font-size:10px;opacity:.6}
 .mx2{background:none;border:0;color:inherit;padding:0 4px;min-height:0;font-size:11px;opacity:.7;box-shadow:none}
+.mq{display:block;width:100%;text-align:start;background:#00000024;border:0;border-inline-start:3px solid var(--ac);border-radius:8px;padding:2px 8px;min-height:0;font-size:12px;opacity:.85;color:inherit;margin-bottom:2px;box-shadow:none}
+.rp{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#ffffff0d;border-inline-start:3px solid var(--ac);border-radius:10px;padding:4px 10px;font-size:12px;margin-bottom:6px}.rp span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fl{outline:2px solid var(--ac)}
+#bl .ic{position:relative}.bd2{position:absolute;top:0;inset-inline-end:0;min-width:16px;height:16px;border-radius:8px;background:var(--ac);color:#1a1405;font-size:10px;line-height:16px;font-weight:700;padding:0 4px}
 </style></head><body>
 <div id="lg" class="card">
  <h1>Sunud Building</h1>
@@ -238,7 +242,7 @@ body:has(.fab) .nav{padding-left:90px}
  <p id="le" class="mu" role="alert"></p>
 </div>
 <div id="mn" hidden>
- <div class="top"><div class="me" id="me"></div><div class="ttl">Sunud<small>Building</small></div><div class="row lf"><span id="sy" class="mu">●</span><button class="ic" onclick="out()" aria-label="خروج"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M16 8l4 4-4 4M20 12H9"/></svg></button></div></div>
+ <div class="top"><div class="me" id="me"></div><div class="ttl">Sunud<small>Building</small></div><div class="row lf"><span id="bl"></span><span id="sy" class="mu">●</span><button class="ic" onclick="out()" aria-label="خروج"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3M16 8l4 4-4 4M20 12H9"/></svg></button></div></div>
  <div id="v"></div>
 </div>
 <div id="fb"></div><div id="tsw"></div>
@@ -247,7 +251,7 @@ const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp
 const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
 const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const nm=k=>W[k][0],co=k=>W[k][1];
-let cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
+let ntl=null,nrl=0,rto=0,c6=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
@@ -294,7 +298,7 @@ async function pcall(a,x={}){
  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});return await r.json()}catch(e){return null}
 }
 function cmerge(j){
- const first=!cOK;cOK=true;cseen=j.seen||{};con=j.on||[];crecv=Date.now();
+ const first=!cOK;cOK=true;if(j.v>=6)c6=1;cseen=j.seen||{};con=j.on||[];crecv=Date.now();
  (j.del||[]).forEach(id=>{const i=msgs.findIndex(m=>m.id===id);if(i>=0){msgs.splice(i,1);cv++}});
  (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++}});
  msgs.sort((a,b)=>a.id-b.id);
@@ -318,16 +322,30 @@ async function sendRd(c){
  const v=rd[c];rs[c]=v;const j=await pcall('mread',{c,id:v});
  if(j&&j.ok)cmerge(j);else rs[c]=0;
 }
-function closeC(){const c=conv;conv=null;sendRd(c)}
-function openC(c){conv=c;rd[c]=Math.max(rd[c]||0,cmax(c));svrd();stick=1;sendRd(c);draw();ping()}
+function closeC(){const c=conv;conv=null;rto=0;sendRd(c)}
+function openC(c){conv=c;rto=0;rd[c]=Math.max(rd[c]||0,cmax(c));svrd();stick=1;sendRd(c);draw();ping()}
 async function msend(){
  const el=$('mi'),t=el?el.value.trim():'';if(!t||!conv||sndg)return;
- sndg=1;const j=await pcall('msend',{to:conv,text:t});sndg=0;
- if(j&&j.ok){if($('mi'))$('mi').value='';stick=1;cmerge(j);rd[conv]=cmax(conv);svrd();draw()}else toast((j&&j.err)||'مفيش اتصال');
+ sndg=1;const j=await pcall('msend',{to:conv,text:t,...(rto&&c6?{re:rto}:{})});sndg=0;
+ if(j&&j.ok){rto=0;if($('mi'))$('mi').value='';stick=1;cmerge(j);rd[conv]=cmax(conv);svrd();draw()}else toast((j&&j.err)||'مفيش اتصال');
 }
 async function mdel(id){
  if(!confirm('مسح الرسالة؟'))return;
  const j=await pcall('mdel',{id});if(j&&j.ok)cmerge(j);else toast((j&&j.err)||'مفيش اتصال');
+}
+function rstrip(){
+ const o=rto?msgs.find(x=>x.id===rto):0;if(rto&&!o)rto=0;
+ return o?`<div class="rp"><span><b>${nm(o.f)}</b> ${E(o.x.slice(0,60))}</span><button class="mx2" onclick="rpl(0)" aria-label="إلغاء">✕</button></div>`:'';
+}
+function rpl(id){rto=id;draw();if(id&&$('mi'))$('mi').focus()}
+function jm(id){const e=$('m'+id);if(e){e.scrollIntoView({block:'center'});e.classList.add('fl');setTimeout(()=>e.classList.remove('fl'),1200)}}
+/* transfer notifications (needs the newer script; no bell on the old one) */
+const nts=()=>st&&Array.isArray(st.nt)?st.nt:null;
+const unN=()=>{const a=nts();return a?a.filter(n=>n.id>(st.nr||0)).length:0};
+function ntx(n){const t=`«${E(n.t)}»`;return n.k==='rq'?`${nm(n.f)} طلب ${t}`:n.k==='ok'?`اتقبل طلبك ${t}`:n.k==='no'?`اتفضّ طلبك ${t}`:n.k==='got'?`اتنقلت لك ${t}`:`${t} اتنقلت إلى ${nm(n.x)}`}
+function notifs(){
+ const a=nts()||[],r=st.nr||0;
+ return `<section class="card"><h2>الإشعارات</h2>`+(a.length?[...a].reverse().map(n=>`<div class="t" style="--oc:${co(n.f||n.x||me)}"><div class="n">${n.id>r?'<i class="dot" style="background:var(--ac)"></i> ':''}${ntx(n)}<span class="mu">${new Date(n.ts).toLocaleString('ar-EG',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</span></div></div>`).join(''):'<div class="empty">مفيش إشعارات</div>')+`</section>`;
 }
 function chatUI(){
  if(!conv){
@@ -337,8 +355,9 @@ function chatUI(){
  }
  const L=msgs.filter(m=>mid(m)===conv);
  const bub=m=>{const mine=m.f===me,tm=new Date(m.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
-  return `<div class="mb${mine?' me':''}">${conv==='all'&&!mine?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}<span class="mx">${E(m.x)}</span><span class="mt">${tm}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
- return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}</div><div class="ml" id="ml">${L.length?L.map(bub).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div><div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
+  const o=m.re?msgs.find(x=>x.id===m.re):0,q=m.re?`<button class="mq" onclick="jm(${m.re})">${o?`<b>${nm(o.f)}</b> ${E(o.x.slice(0,60))}`:'رسالة محذوفة'}</button>`:'';
+  return `<div class="mb${mine?' me':''}" id="m${m.id}">${conv==='all'&&!mine?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}${q}<span class="mx">${E(m.x)}</span><span class="mt">${tm}${c6?` <button class="mx2" onclick="rpl(${m.id})" aria-label="رد">↩</button>`:''}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
+ return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}</div><div class="ml" id="ml">${L.length?L.map(bub).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div>${rstrip()}<div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
 }
 function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
 /* actions: same backend calls and payloads as before */
@@ -467,9 +486,15 @@ function draw(){
  const keep=document.activeElement&&document.activeElement.id==='ti'?$('ti').value:null;
  $('me').innerHTML=`<i class="dot" style="background:${co(me)}"></i><b>${nm(me)}</b>${adm?'<span class="ad">أدمن</span>':''}`;
  if(!adm&&tab==='s')tab='h';
+ if(tab==='n'&&!nts())tab='h';
+ {const a=nts();if(a){const mx=a.reduce((x,n)=>Math.max(x,n.id),0),u=unN();
+  if(ntl===null)ntl=mx;else if(mx>ntl){const f=a.filter(n=>n.id>ntl);ntl=mx;if(tab!=='n')toast(ntx(f[f.length-1]))}
+  $('bl').innerHTML=`<button class="ic" onclick="setTab(tab==='n'?'h':'n')" aria-label="إشعارات"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 0 1 12 0v6l1.5 2h-15zM10 21h4"/></svg>${u?`<span class="bd2">${u}</span>`:''}</button>`;
+  if(tab==='n'&&u&&mx>nrl){nrl=mx;call('nread',{id:mx})}
+ }else $('bl').innerHTML=''}
  if(tab==='m'&&!cOK)tab='h';
  const kmE=$('mi'),km=kmE?kmE.value:null,kmF=!!kmE&&document.activeElement===kmE,mlE=$('ml'),nearB=mlE?mlE.scrollHeight-mlE.scrollTop-mlE.clientHeight<60:1;
- const v=tab==='c'?city():tab==='s'?settings():tab==='u'?team():tab==='m'?chatUI():home();
+ const v=tab==='n'?notifs():tab==='c'?city():tab==='s'?settings():tab==='u'?team():tab==='m'?chatUI():home();
  const IC={m:'<path d="M4 5h16v11H9l-5 4z"/>',u:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.8-6 6-6s6 2.5 6 6M16 5.5a3 3 0 0 1 0 5.6M18 14.5c2 .8 3 2.6 3 5.5"/>',h:'<path d="M5 20V8l7-4 7 4v12M9 20v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01"/>',c:'<path d="M3 20h18M5 20V10h5v10M10 20V5h5v15M15 20v-7h4v7"/>',s:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>'};
  const nb=(k,l,b)=>`<button class="${tab===k?'a':''}" onclick="setTab('${k}')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><span>${l}</span>${b?`<span class="bd">${b}</span>`:''}</button>`;
  $('v').innerHTML=v;
