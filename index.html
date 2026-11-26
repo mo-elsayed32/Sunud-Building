@@ -361,8 +361,8 @@ function mmenu(id,el){mclose();const r=el.getBoundingClientRect(),d=document.cre
 (function(){let g=null,lp=0;
  const mb=t=>t&&t.closest?t.closest('.mb[id^="m"]'):null;
  addEventListener('touchstart',e=>{const b=mb(e.target);if(!b||e.touches.length!==1){if(!e.target.closest||!e.target.closest('#mmn'))mclose();g=null;return}const t=e.touches[0];g={b,id:+b.id.slice(1),x:t.clientX,y:t.clientY,dx:0,sw:0,lp:0};clearTimeout(lp);lp=setTimeout(()=>{if(g&&!g.sw&&Math.abs(g.dx)<8){g.lp=1;window.__lpt=Date.now();mmenu(g.id,g.b)}},500)},{passive:true});
- addEventListener('touchmove',e=>{if(!g)return;const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;g.dx=dx;if(!g.sw){if(Math.abs(dy)>10){clearTimeout(lp);g=null;return}if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.5){g.sw=1;clearTimeout(lp)}}if(g.sw&&c6){const v=Math.max(-70,Math.min(70,dx));g.b.style.transition='none';g.b.style.transform=`translateX(${v}px)`}},{passive:true});
- addEventListener('touchend',()=>{clearTimeout(lp);if(!g)return;const b=g.b;b.style.transition='transform .15s';b.style.transform='';if(g.sw&&c6&&Math.abs(g.dx)>=60)rpl(g.id);g=null},{passive:true});
+ addEventListener('touchmove',e=>{if(!g)return;const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;g.dx=dx;if(!g.sw){if(Math.abs(dy)>10){clearTimeout(lp);g=null;return}if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.5){g.sw=1;clearTimeout(lp)}}if(g.sw&&c6){const v=Math.max(0,Math.min(70,dx));g.b.style.transition='none';g.b.style.transform=`translateX(${v}px)`}},{passive:true});
+ addEventListener('touchend',()=>{clearTimeout(lp);if(!g)return;const b=g.b;b.style.transition='transform .15s';b.style.transform='';if(g.sw&&c6&&g.dx>=60)rpl(g.id);g=null},{passive:true});
  addEventListener('touchcancel',()=>{clearTimeout(lp);if(g){g.b.style.transform=''}g=null},{passive:true});
  addEventListener('contextmenu',e=>{if(mb(e.target))e.preventDefault()});
  addEventListener('click',e=>{if(Date.now()-(window.__lpt||0)<700)return;if(!e.target.closest('#mmn'))mclose()});
