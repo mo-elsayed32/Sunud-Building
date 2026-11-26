@@ -265,7 +265,7 @@ function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
 /* actions: same backend calls and payloads as before */
 async function add(){
  const t=$('ti').value.trim();if(!t)return;
- const j=await go('add',{title:t,owner:window.ao||me});if(j.ok){sheet=0;draw()}
+ const j=await go('add',{title:t,owner:adm?(window.ao||me):me});if(j.ok){sheet=0;draw()}
 }
 async function act(f,id,...r){if(busy[id])return;busy[id]=1;draw();try{await f(id,...r)}finally{delete busy[id];draw()}}
 const dn=id=>act(i=>go('done',{id:i}),id),mv=(id,to)=>act(i=>go('move',{id:i,to}),id),rq=id=>act(i=>go('req',{id:i}),id);
@@ -379,7 +379,7 @@ function settings(){
 }
 function sheetUI(){
  window.ao=window.ao||me;
- return `<div class="shb" onclick="if(event.target===this){sheet=0;draw()}"><div class="sh" role="dialog" aria-label="مهمة جديدة"><div class="row"><input id="ti" placeholder="المهمة" maxlength="120" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')add()"><button class="p" onclick="add()" aria-label="إضافة">+</button></div><div class="ch">${K.map(k=>`<button class="${window.ao==k?'on':''}" onclick="window.ao='${k}';draw()"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('')}</div></div></div>`;
+ return `<div class="shb" onclick="if(event.target===this){sheet=0;draw()}"><div class="sh" role="dialog" aria-label="مهمة جديدة"><div class="row"><input id="ti" placeholder="المهمة" maxlength="120" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')add()"><button class="p" onclick="add()" aria-label="إضافة">+</button></div>${adm?`<div class="ch">${K.map(k=>`<button class="${window.ao==k?'on':''}" onclick="window.ao='${k}';draw()"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('')}</div>`:''}</div></div>`;
 }
 function draw(){
  if(!st)return;
@@ -390,7 +390,7 @@ function draw(){
  const IC={u:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.8-6 6-6s6 2.5 6 6M16 5.5a3 3 0 0 1 0 5.6M18 14.5c2 .8 3 2.6 3 5.5"/>',h:'<path d="M5 20V8l7-4 7 4v12M9 20v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01"/>',c:'<path d="M3 20h18M5 20V10h5v10M10 20V5h5v15M15 20v-7h4v7"/>',s:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>'};
  const nb=(k,l,b)=>`<button class="${tab===k?'a':''}" onclick="setTab('${k}')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><span>${l}</span>${b?`<span class="bd">${b}</span>`:''}</button>`;
  $('v').innerHTML=v;
- $('fb').innerHTML=(adm&&(tab==='h'||tab==='u')&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet&&adm?sheetUI():'')+`<div class="nav"><div>${nb('h','مهامي')}${nb('u','الفريق')}${nb('c','Building')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length):''}</div></div>`;
+ $('fb').innerHTML=((adm?(tab==='h'||tab==='u'):tab==='h')&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet?sheetUI():'')+`<div class="nav"><div>${nb('h','مهامي')}${nb('u','الفريق')}${nb('c','Building')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length):''}</div></div>`;
  if(keep!==null&&$('ti')){$('ti').value=keep;$('ti').focus()}
  seen=new Set(st.tasks.filter(t=>t.s==='done').map(t=>t.id));
 }
