@@ -371,6 +371,7 @@ function jm(id){const e=$('m'+id);if(e){e.scrollIntoView({block:'center'});e.cla
 /* transfer notifications (needs the newer script; no bell on the old one) */
 const nts=()=>st&&Array.isArray(st.nt)?st.nt:null;
 const unN=()=>{const a=nts();return a?a.filter(n=>n.id>(st.nr||0)).length:0};
+function appBadge(){if(!('setAppBadge' in navigator))return;try{const n=(unN()||0)+(unrAll()||0);if(n)navigator.setAppBadge(n);else navigator.clearAppBadge()}catch(e){}}
 function ntx(n){const t=`«${E(n.t)}»`;return n.k==='rq'?`${nm(n.f)} طلب ${t}`:n.k==='ok'?`اتقبل طلبك ${t}`:n.k==='no'?`اتفضّ طلبك ${t}`:n.k==='got'?`اتنقلت لك ${t}`:`${t} اتنقلت إلى ${nm(n.x)}`}
 const FCM={cfg:{apiKey:'AIzaSyAFGEv51BIf5KVejjb1t3nEcjbx9CyphG8',authDomain:'sunudbuilding.firebaseapp.com',projectId:'sunudbuilding',storageBucket:'sunudbuilding.firebasestorage.app',messagingSenderId:'275185283072',appId:'1:275185283072:web:6bc5c358b8787ce89e68e5'},vapid:'BOdz4uyb3NreyR26OOt32imFv_SSrxnyZRFl_W5hkp1JbiXLGbitRLG9437Ac0va3TQTDMgGHy9lwP5RQqbhttw'},FV='13.4.0';
 function pushOK(){return !!FCM&&!!FCM.vapid&&(sv===7||sv>=9)&&'Notification' in window&&'serviceWorker' in navigator}
@@ -579,7 +580,7 @@ function draw(){
  $('v').innerHTML=v;if(window.__tabNew){window.__tabNew=0;const e=$('v');e.classList.remove('fi');void e.offsetWidth;e.classList.add('fi')}
  $('fb').innerHTML=((adm?(tab==='h'||tab==='u'):tab==='h')&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet?sheetUI():'')+`<div class="nav"><div>${nb('h','مهامي')}${nb('u','الفريق')}${cOK?nb('m','الدردشة',unrAll()):''}${nb('c','Building')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length+lk.length):''}</div></div>`;
  {const e=sheet&&!window.__sh0?document.querySelector('.sh'):null;if(e)e.classList.add('in');window.__sh0=sheet}
- if(keep!==null&&$('ti')){$('ti').value=keep;$('ti').focus()}
+ appBadge();if(keep!==null&&$('ti')){$('ti').value=keep;$('ti').focus()}
  if(km!==null&&$('mi')){$('mi').value=km;if(kmF)$('mi').focus()}
  {const m2=$('ml');if(m2&&(stick||nearB)){m2.scrollTop=m2.scrollHeight;stick=0}}
  if(frs.size)setTimeout(()=>frs.clear(),350);
