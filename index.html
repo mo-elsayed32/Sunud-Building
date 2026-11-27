@@ -502,6 +502,15 @@ function team(){
   return `<div class="tm"><button class="th" onclick="tg('${k}')" aria-expanded="${op}"><i class="dot" style="background:${co(k)}"></i><b>${nm(k)}</b>${pd(k)}<span class="mu">${m.a.length?m.dn+'/'+m.a.length:'—'}</span><span class="bar"><i style="width:${m.p}%;background:${co(k)}"></i></span><span class="chv">${op?'⌃':'⌄'}</span></button>${op?`<div class="tb">${tasks(mt,!live)}</div>`:''}</div>`}).join('');
  return `<div class="home"><div class="l">${scn(ts,vb,live,o)}</div><div class="r"><section class="flat teamc">${req}${cards}</section></div></div>`;
 }
+function weeks(){
+ const dn=st.tasks.filter(t=>t.s==='done'&&t.d);
+ if(!dn.length)return '';
+ const ws=x=>{const d=new Date(x);d.setHours(0,0,0,0);d.setDate(d.getDate()-((d.getDay()+1)%7));return +d},now=ws(Date.now()),map={};
+ dn.forEach(t=>{const k=ws(t.d);(map[k]=map[k]||[]).push(t)});
+ const keys=Object.keys(map).map(Number).sort((a,b)=>b-a).slice(0,6);
+ return `<section class="card"><h2>الملخص</h2>`+keys.map(k=>{const a=map[k],lbl=k===now?'الأسبوع ده':k===now-6048e5?'اللي فات':new Date(k).toLocaleDateString('ar-EG',{day:'numeric',month:'short'});
+  return `<div class="row sp" style="margin-top:8px"><span class="${k===now?'':'mu'}">${lbl}</span><span class="v">${a.length}</span></div><div class="bar sg">${a.map(t=>`<i style="background:${co(t.owner)}"></i>`).join('')}</div>`}).join('')+`</section>`;
+}
 function city(){
  const c=st.cfg,cur=st.cur,per=c.bpb*c.bpc,cl=cur-1,base=Math.floor(cl/per)*per,cities=Math.floor(cl/per);
  const cts=byB(cur),cdn=cts.filter(t=>t.s==='done').length,cb=cts.length?`<div class="row sp" style="margin-top:10px"><span class="mu">مبنى ${cur}</span><span class="v">${cdn}/${cts.length}</span></div><div class="bar sg">${[...cts.filter(t=>t.s==='done'),...cts.filter(t=>t.s==='open')].map(t=>`<i style="background:${co(t.owner)}${t.s==='done'?'':'22'}"></i>`).join('')}</div>`:'';
@@ -510,7 +519,7 @@ function city(){
   t+=`<button class="tl${k===cur?' cu':''}${fu?' fu':''}" ${fu?'disabled':''} onclick="openB(${k})" aria-label="مبنى ${k}">${tile(ts,k)}<small>${k}</small></button>`}
   rows+=`<div class="br" style="grid-template-columns:repeat(${c.bpb},1fr)">${t}</div>`}
  const doneB=Math.max(0,cur-1),tot=st.tasks.filter(t=>t.s==='done').length;
- return `<section class="card"><div class="row sp"><b>مدينة ${cities+1}</b><span class="mu">${cl-base}/${per} مبنى</span></div><div class="sm"><span>${doneB} مبنى مقفول</span><span>${tot} مهمة اتنفذت</span>${cities?`<span>${cities} مدينة مكتملة</span>`:''}</div>${cb}<div class="blk">${rows}</div></section>`;
+ return `<section class="card"><div class="row sp"><b>مدينة ${cities+1}</b><span class="mu">${cl-base}/${per} مبنى</span></div><div class="sm"><span>${doneB} مبنى مقفول</span><span>${tot} مهمة اتنفذت</span>${cities?`<span>${cities} مدينة مكتملة</span>`:''}</div>${cb}<div class="blk">${rows}</div></section>`+weeks();
 }
 function settings(){
  const c=st.cfg,ts=byB(st.cur),op=ts.filter(t=>t.s==='open'),dn=ts.filter(t=>t.s==='done').length;
