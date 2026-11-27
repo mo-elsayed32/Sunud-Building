@@ -326,7 +326,7 @@ async function pcall(a,x={}){
  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});return await r.json()}catch(e){return null}
 }
 function cmerge(j){
- const first=!cOK;cOK=true;sv=j.v||0;if(j.v>=6)c6=1;if(j.v>=7)c7=1;if(j.v>=8)c9=1;if(j.rr){c8=1;crr=j.rr;crx=j.rx||{};ced=j.ed||{};cty=j.ty||[];for(const id in prx){const o=crx[id]||(crx[id]={});if(prx[id])o[me]=prx[id];else delete o[me];if(!Object.keys(o).length)delete crx[id]}}cseen=j.seen||{};con=j.on||[];crecv=Date.now();
+ const first=!cOK;cOK=true;sv=j.v||0;if(j.cv!==undefined)chv=j.cv;if(j.v>=6)c6=1;if(j.v>=7)c7=1;if(j.v>=8)c9=1;if(j.rr){c8=1;crr=j.rr;cty=j.ty||[]}if(j.rx){crx=j.rx;for(const id in prx){const o=crx[id]||(crx[id]={});if(prx[id])o[me]=prx[id];else delete o[me];if(!Object.keys(o).length)delete crx[id]}}if(j.ed)ced=j.ed;cseen=j.seen||{};con=j.on||[];crecv=Date.now();
  (j.del||[]).forEach(id=>{const i=msgs.findIndex(m=>m.id===id);if(i>=0){msgs.splice(i,1);cv++}});
  (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++;if(!first&&conv)frs.add(m.id)}});
  msgs.sort((a,b)=>a.id-b.id);
@@ -343,7 +343,7 @@ function cmerge(j){
 if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{const d=e.data||{};if(d.t==='open'&&(d.c==='all'||W[d.c])&&d.c!==me){if(cOK){setTab('m');openC(d.c)}else window.__pendC=d.c}});
 async function ping(){
  if(!me||!code||!st||document.hidden||cOK===false)return;
- const j=await pcall('ping',{since:csince});
+ const j=await pcall('ping',{since:csince,...(chv?{cv:chv}:{})});
  if(!j)return;
  if(!j.ok){if(badCode(j)&&!$('mn').hidden)authLost(j.err);if(/معروف/.test(j.err||''))cOK=false;return}
  cmerge(j);
@@ -378,7 +378,7 @@ function rstrip(){
 }
 function rpl(id){rto=id;edt=0;draw();if(id&&$('mi'))$('mi').focus()}
 const RXS=['👍','❤️','😂','😮','😢','🙏'],mtx=m=>ced[m.id]!==undefined?ced[m.id]:m.x;
-const prx={};
+const prx={};let chv='';
 async function mrx(id,e){mclose();const cur=(crx[id]||{})[me],v=cur===e?'':e;prx[id]=v;{const o=crx[id]||(crx[id]={});if(v)o[me]=v;else delete o[me];if(!Object.keys(o).length)delete crx[id]}draw();
  const j=await pcall('mrx',{id,e:v});delete prx[id];
  if(j&&j.ok){cmerge(j);draw()}else{{const o=crx[id]||(crx[id]={});if(cur)o[me]=cur;else delete o[me];if(!Object.keys(o).length)delete crx[id]}draw();toast((j&&j.err)||'مفيش اتصال')}}
