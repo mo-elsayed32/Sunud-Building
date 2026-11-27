@@ -41,7 +41,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 /* members */
 .mb{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}
 .mb div{min-width:0}.mb .n{font-size:11px;line-height:1.25;color:var(--mu);min-height:28px}.mb .v{font-size:13px;font-weight:700}
-.bar{height:6px;border-radius:3px;background:#0e1730;margin-top:4px;overflow:hidden}.bar i{display:block;height:100%;border-radius:3px;transition:width .5s}
+.bar{height:6px;border-radius:3px;background:#0e1730;margin-top:4px;overflow:hidden}.bar i{display:block;height:100%;border-radius:3px;transition:width .5s}.bar.sg{display:flex;gap:2px;height:8px}.bar.sg i{flex:1;border-radius:2px;transition:none}
 .mb .z{opacity:.4}
 /* tasks */
 .t{display:flex;gap:10px;align-items:center;padding:10px 12px;margin-bottom:8px;background:var(--cd2);border-radius:12px;border-inline-start:5px solid var(--oc)}
@@ -504,12 +504,13 @@ function team(){
 }
 function city(){
  const c=st.cfg,cur=st.cur,per=c.bpb*c.bpc,cl=cur-1,base=Math.floor(cl/per)*per,cities=Math.floor(cl/per);
+ const cts=byB(cur),cdn=cts.filter(t=>t.s==='done').length,cb=cts.length?`<div class="row sp" style="margin-top:10px"><span class="mu">مبنى ${cur}</span><span class="v">${cdn}/${cts.length}</span></div><div class="bar sg">${[...cts.filter(t=>t.s==='done'),...cts.filter(t=>t.s==='open')].map(t=>`<i style="background:${co(t.owner)}${t.s==='done'?'':'22'}"></i>`).join('')}</div>`:'';
  let rows='';
  for(let r=0;r<c.bpc;r++){let t='';for(let j=0;j<c.bpb;j++){const k=base+r*c.bpb+j+1,ts=byB(k),fu=k>cur;
   t+=`<button class="tl${k===cur?' cu':''}${fu?' fu':''}" ${fu?'disabled':''} onclick="openB(${k})" aria-label="مبنى ${k}">${tile(ts,k)}<small>${k}</small></button>`}
   rows+=`<div class="br" style="grid-template-columns:repeat(${c.bpb},1fr)">${t}</div>`}
  const doneB=Math.max(0,cur-1),tot=st.tasks.filter(t=>t.s==='done').length;
- return `<section class="card"><div class="row sp"><b>مدينة ${cities+1}</b><span class="mu">${cl-base}/${per} مبنى</span></div><div class="sm"><span>${doneB} مبنى مقفول</span><span>${tot} مهمة اتنفذت</span>${cities?`<span>${cities} مدينة مكتملة</span>`:''}</div><div class="blk">${rows}</div></section>`;
+ return `<section class="card"><div class="row sp"><b>مدينة ${cities+1}</b><span class="mu">${cl-base}/${per} مبنى</span></div><div class="sm"><span>${doneB} مبنى مقفول</span><span>${tot} مهمة اتنفذت</span>${cities?`<span>${cities} مدينة مكتملة</span>`:''}</div>${cb}<div class="blk">${rows}</div></section>`;
 }
 function settings(){
  const c=st.cfg,ts=byB(st.cur),op=ts.filter(t=>t.s==='open'),dn=ts.filter(t=>t.s==='done').length;
