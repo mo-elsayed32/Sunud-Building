@@ -243,6 +243,10 @@ button{transition:background .15s,transform .22s cubic-bezier(.34,1.56,.64,1)}.n
 .ck.pp{animation:pp .35s cubic-bezier(.34,1.56,.64,1)}@keyframes pp{from{transform:scale(.78)}}
 .mb.nw{animation:bi .2s ease-out}@keyframes bi{from{opacity:0;transform:translateY(8px)}}
 .mb.gp{margin-top:-3px}.dv{align-self:center;font-size:11px;color:var(--mu);padding:2px 10px;background:#ffffff0c;border-radius:10px;margin:6px 0}
+.ms{align-self:center;text-align:center;font-size:12px;color:var(--mu);padding:5px 12px}
+.du{font-weight:500}.du.o{color:#e46962}.du.t{color:var(--ac)}button.du{background:none;border:0;padding:0;font:inherit;cursor:pointer}
+.db{display:flex;gap:10px;align-items:center;font-size:13px;padding:10px 14px}
+.dt{color-scheme:dark;background:var(--cd2);color:var(--tx);border:1px solid var(--ln);border-radius:10px;padding:8px 10px;font:inherit;font-size:13px;width:100%;box-sizing:border-box}
 @media(prefers-reduced-motion:reduce){.fi,.sh.in,.ck.pp,.mb.nw{animation:none}button{transition:none}}
 </style></head><body>
 <div id="lg" class="card">
@@ -262,7 +266,7 @@ const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp
 const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
 const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const nm=k=>W[k][0],co=k=>W[k][1];
-let frs=new Set(),c8=0,crr={},crx={},ced={},cty=[],edt=0,lty=0,ntl=null,nrl=0,rto=0,c6=0,c7=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
+let frs=new Set(),c8=0,crr={},crx={},ced={},cty=[],edt=0,lty=0,ntl=null,nrl=0,rto=0,c6=0,c7=0,c9=0,sv=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
@@ -312,7 +316,7 @@ async function pcall(a,x={}){
  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});return await r.json()}catch(e){return null}
 }
 function cmerge(j){
- const first=!cOK;cOK=true;if(j.v>=6)c6=1;if(j.v>=7)c7=1;if(j.rr){c8=1;crr=j.rr;crx=j.rx||{};ced=j.ed||{};cty=j.ty||[]}cseen=j.seen||{};con=j.on||[];crecv=Date.now();
+ const first=!cOK;cOK=true;sv=j.v||0;if(j.v>=6)c6=1;if(j.v>=7)c7=1;if(j.v>=8)c9=1;if(j.rr){c8=1;crr=j.rr;crx=j.rx||{};ced=j.ed||{};cty=j.ty||[]}cseen=j.seen||{};con=j.on||[];crecv=Date.now();
  (j.del||[]).forEach(id=>{const i=msgs.findIndex(m=>m.id===id);if(i>=0){msgs.splice(i,1);cv++}});
  (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++;if(!first&&conv)frs.add(m.id)}});
  msgs.sort((a,b)=>a.id-b.id);
@@ -320,10 +324,13 @@ function cmerge(j){
  const sr=j.rd||{},hs=Object.keys(sr).length>0;
  Object.keys(sr).forEach(c=>{if(sr[c]>(rd[c]||0)){rd[c]=sr[c];rs[c]=Math.max(rs[c]||0,sr[c])}});
  if(first&&!rdn&&!hs){['all',...K.filter(k=>k!==me)].forEach(c=>{rd[c]=cmax(c)});svrd()}
+ if(first&&sv>=8){try{const h=location.hash;if(h.startsWith('#c=')){const c=h.slice(3);history.replaceState(0,'','./');if(c==='all'||W[c])window.__pendC=c}}catch(e){}
+  if(window.__pendC){const c=window.__pendC;window.__pendC=0;if(c==='all'||(W[c]&&c!==me)){setTab('m');openC(c)}}}
  if(conv&&cmax(conv)>(rd[conv]||0)){rd[conv]=cmax(conv);svrd();sendRd(conv)}
  const g=con.join()+'|'+cv+'|'+unrAll()+'|'+(conv?conv:Math.floor(Date.now()/60000))+'|'+(c8?JSON.stringify([crr,crx,ced,cty]):'');
  if(g!==csig){csig=g;draw()}
 }
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{const d=e.data||{};if(d.t==='open'&&(d.c==='all'||W[d.c])&&d.c!==me){if(cOK){setTab('m');openC(d.c)}else window.__pendC=d.c}});
 async function ping(){
  if(!me||!code||!st||document.hidden||cOK===false)return;
  const j=await pcall('ping',{since:csince});
@@ -366,7 +373,7 @@ const nts=()=>st&&Array.isArray(st.nt)?st.nt:null;
 const unN=()=>{const a=nts();return a?a.filter(n=>n.id>(st.nr||0)).length:0};
 function ntx(n){const t=`«${E(n.t)}»`;return n.k==='rq'?`${nm(n.f)} طلب ${t}`:n.k==='ok'?`اتقبل طلبك ${t}`:n.k==='no'?`اتفضّ طلبك ${t}`:n.k==='got'?`اتنقلت لك ${t}`:`${t} اتنقلت إلى ${nm(n.x)}`}
 const FCM={cfg:{apiKey:'AIzaSyAFGEv51BIf5KVejjb1t3nEcjbx9CyphG8',authDomain:'sunudbuilding.firebaseapp.com',projectId:'sunudbuilding',storageBucket:'sunudbuilding.firebasestorage.app',messagingSenderId:'275185283072',appId:'1:275185283072:web:6bc5c358b8787ce89e68e5'},vapid:'BOdz4uyb3NreyR26OOt32imFv_SSrxnyZRFl_W5hkp1JbiXLGbitRLG9437Ac0va3TQTDMgGHy9lwP5RQqbhttw'},FV='13.4.0';
-function pushOK(){return !!FCM&&!!FCM.vapid&&c7&&'Notification' in window&&'serviceWorker' in navigator}
+function pushOK(){return !!FCM&&!!FCM.vapid&&(sv===7||sv>=9)&&'Notification' in window&&'serviceWorker' in navigator}
 function pushCard(){if(!pushOK())return'';const g=Notification.permission==='granted'&&localStorage.getItem('pt_'+me);return `<section class="card"><div class="t"><div class="n">${g?'التنبيهات شغالة':'تنبيهات على التليفون'}</div>${g?'':'<button class="p" onclick="pushOn()">تفعيل</button>'}</div></section>`}
 async function pushOn(){try{if(await Notification.requestPermission()!=='granted')return;const reg=await navigator.serviceWorker.ready;await new Promise((ok,no)=>{const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/'+FV+'/firebase-app-compat.js';a.onload=ok;a.onerror=no;document.head.appendChild(a)});await new Promise((ok,no)=>{const a=document.createElement('script');a.src='https://www.gstatic.com/firebasejs/'+FV+'/firebase-messaging-compat.js';a.onload=ok;a.onerror=no;document.head.appendChild(a)});firebase.apps.length||firebase.initializeApp(FCM.cfg);const tok=await firebase.messaging().getToken({vapidKey:FCM.vapid,serviceWorkerRegistration:reg});if(tok){const r=await call('ftok',{tok});if(r&&r.ok){localStorage.setItem('pt_'+me,'1');draw()}}}catch(e){}}
 
@@ -399,7 +406,8 @@ function chatUI(){
  }
  const hd=hidSet();const L=msgs.filter(m=>mid(m)===conv&&!hd.has(m.id));
 const dk=ts=>new Date(ts).toDateString();
- const bub=(m,pv)=>{const mine=m.f===me,gp=!!pv&&pv.f===m.f&&m.ts-pv.ts<3e5&&dk(pv.ts)===dk(m.ts),dv=!pv||dk(pv.ts)!==dk(m.ts)?`<div class="dv">${new Date(m.ts).toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'})}</div>`:'',tm=new Date(m.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+ const bub=(m,pv)=>{const mine=m.f===me,gp=!!pv&&pv.f===m.f&&!pv.k&&!m.k&&m.ts-pv.ts<3e5&&dk(pv.ts)===dk(m.ts),dv=!pv||dk(pv.ts)!==dk(m.ts)?`<div class="dv">${new Date(m.ts).toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'})}</div>`:'',tm=new Date(m.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+  if(m.k==='sys')return dv+`<div class="ms">${E(m.x)}</div>`;
   const o=m.re?msgs.find(x=>x.id===m.re):0,q=m.re?`<button class="mq" onclick="jm(${m.re})">${o?`<b>${nm(o.f)}</b> ${E(o.x.slice(0,60))}`:'رسالة محذوفة'}</button>`:'';
   return dv+`<div class="mb${mine?' me':''}${gp?' gp':''}${frs.has(m.id)?' nw':''}" id="m${m.id}">${conv==='all'&&!mine&&!gp?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}${q}<span class="mx">${E(mtx(m))}</span>${rxS(m)}<span class="mt">${tm}${c8&&ced[m.id]!==undefined?' معدّلة':''}${tkS(m)}${c6?` <button class="mx2" onclick="rpl(${m.id})" aria-label="رد">↩</button>`:''}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
  return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}${tyS()}</div><div class="ml" id="ml">${L.length?L.map((m,i)=>bub(m,L[i-1])).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div>${rstrip()}<div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" oninput="tyP()" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
@@ -409,8 +417,9 @@ function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
 async function add(){
  const t=$('ti').value.trim();if(!t)return;
  const ow=adm?(window.ao||me):me,tmp={id:-Date.now(),title:t.slice(0,120),owner:ow,by:adm?'admin':'self',s:'open',b:st.cur};
+ const dE=c9?$('td'):null,due=dE&&dE.value?Date.parse(dE.value+'T12:00:00'):0;if(due)tmp.due=due;
  st.tasks.push(tmp);busy[tmp.id]=1;sheet=0;draw();
- const j=await go('add',{title:t,owner:ow});delete busy[tmp.id];
+ const j=await go('add',{title:t,owner:ow,...(due?{due}:{})});delete busy[tmp.id];
  if(!j.ok){st.tasks=st.tasks.filter(x=>x!==tmp);sheet=1;draw();if($('ti'))$('ti').value=t}else draw()
 }
 async function act(f,id,...r){if(busy[id])return;busy[id]=1;draw();try{await f(id,...r)}finally{delete busy[id];draw()}}
@@ -461,8 +470,17 @@ function members(ts){
  return `<div class="mb">`+K.map(k=>{const a=ts.filter(t=>t.owner===k),dn=a.filter(t=>t.s==='done').length,p=a.length?Math.round(dn/a.length*100):0;
   return `<div class="${a.length?'':'z'}"><i class="dot" style="background:${co(k)}"></i><div class="n">${nm(k)}</div><div class="v">${a.length?dn+'/'+a.length:'—'}</div><div class="bar"><i style="width:${p}%;background:${co(k)}"></i></div></div>`}).join('')+`</div>`;
 }
+const d0=()=>{const d=new Date();d.setHours(0,0,0,0);return +d};
+const dueS=t=>{if(!c9||!t.due||t.s!=='open')return'';const z=d0(),tm=+new Date(t.due),lbl=tm<z?'متأخر':tm<z+864e5?'النهارده':new Date(t.due).toLocaleDateString('ar-EG',{day:'numeric',month:'short'}),cl=tm<z?'o':tm<z+864e5?'t':'';
+ const ed=t.owner===me||adm;return ` · ${ed?`<button class="du ${cl}" onclick="dueP(${t.id})" aria-label="تعديل الميعاد">${lbl}</button><button class="du" onclick="dueC(${t.id})" aria-label="مسح الميعاد" style="color:var(--mu)">✕</button>`:`<b class="du ${cl}">${lbl}</b>`}`};
+async function dueP(id){const i=document.createElement('input');i.type='date';i.style.position='fixed';i.style.opacity='0';i.style.pointerEvents='none';document.body.appendChild(i);
+ i.onchange=async()=>{const v=i.value;i.remove();if(!v)return;const due=Date.parse(v+'T12:00:00');const t=st.tasks.find(x=>x.id===id);if(t)t.due=due;draw();const j=await go('due',{id,due});if(!j.ok)call('get')};
+ i.onblur=()=>setTimeout(()=>i.remove(),400);
+ try{i.showPicker()}catch(e){i.remove();const v=prompt('الميعاد (yyyy-mm-dd)');if(v&&/^\d{4}-\d{2}-\d{2}$/.test(v)){const due=Date.parse(v+'T12:00:00');const t=st.tasks.find(x=>x.id===id);if(t)t.due=due;draw();go('due',{id,due}).then(j=>{if(!j.ok)call('get')})}}}
+async function dueC(id){const t=st.tasks.find(x=>x.id===id);if(t)delete t.due;draw();const j=await go('due',{id,due:0});if(!j.ok)call('get')}
 function tasks(ts,ro){
  const op=ts.filter(t=>t.s==='open'),d=ts.filter(t=>t.s==='done').sort((a,b)=>a.d-b.d);
+ if(c9){const z=d0();op.sort((a,b)=>{const k=t=>t.due?(t.due<z?0:t.due<z+864e5?1:2)*1e13+t.due:4e13;return k(a)-k(b)})}
  if(!ts.length)return `<div class="empty">مفيش مهام</div>`;
  return [...op,...d].map(t=>{
   const own=t.owner===me,pend=st.reqs.some(r=>r.tid===t.id&&r.to===me),b=busy[t.id];
@@ -476,7 +494,7 @@ function tasks(ts,ro){
    if(!adm&&!own&&t.s==='open')a=`<button ${pend||b?'disabled':''} onclick="rq(${t.id})">${pend?'اتطلبت':'اطلبها'}</button>`;
   }
   if(!a&&t.s==='done')a='<i class="ckd">✓</i>';
-  return `<div class="t${t.s==='done'?' d':''}" style="--oc:${co(t.owner)}"><div class="n">${E(t.title)}<span class="mu">${nm(t.owner)}${t.dq?` · <b class="dq">بانتظار المسح · ${dleft(t)} يوم</b>`:''}</span></div>${a}</div>`}).join('');
+  return `<div class="t${t.s==='done'?' d':''}" style="--oc:${co(t.owner)}"><div class="n">${E(t.title)}<span class="mu">${nm(t.owner)}${dueS(t)}${t.dq?` · <b class="dq">بانتظار المسح · ${dleft(t)} يوم</b>`:''}</span></div>${a}</div>`}).join('');
 }
 const own1=(ts,k)=>{const a=ts.filter(t=>t.owner===k),dn=a.filter(t=>t.s==='done').length;return{a,dn,p:a.length?Math.round(dn/a.length*100):0}};
 function scn(ts,vb,live,o){
@@ -489,8 +507,11 @@ function scn(ts,vb,live,o){
 function home(){
  const cur=st.cur,vb=viewB||cur,ts=byB(vb),live=vb===cur,o=ts.filter(t=>t.s==='open').length;
  const m=own1(ts,me),mine=ts.filter(t=>t.owner===me);
+ const dbn=()=>{if(!c9||!live)return'';const z=d0(),a=ts.filter(t=>t.owner===me&&t.s==='open'&&t.due&&t.due<z+864e5);if(!a.length)return'';
+  const ov=a.filter(t=>t.due<z).length,td=a.length-ov,p=[];if(ov)p.push(`<b class="du o">متأخر ${ov}</b>`);if(td)p.push(`<b class="du t">النهارده ${td}</b>`);
+  return `<section class="card db">${p.join(' · ')}</section>`};
  return `<div class="home"><div class="l">${scn(ts,vb,live,o)}
-  <section class="card mine"><div class="row sp"><span class="row" style="gap:8px"><i class="dot" style="background:${co(me)}"></i><b>مهامي</b></span><span class="v">${m.a.length?m.dn+'/'+m.a.length:'—'}</span></div><div class="bar"><i style="width:${m.p}%;background:${co(me)}"></i></div></section></div>
+  ${dbn()}<section class="card mine"><div class="row sp"><span class="row" style="gap:8px"><i class="dot" style="background:${co(me)}"></i><b>مهامي</b></span><span class="v">${m.a.length?m.dn+'/'+m.a.length:'—'}</span></div><div class="bar"><i style="width:${m.p}%;background:${co(me)}"></i></div></section></div>
   <div class="r"><section class="flat">${tasks(mine,!live)}</section></div></div>`;
 }
 const tg=k=>{opn[k]=!opn[k];draw()};
@@ -537,7 +558,7 @@ function settings(){
 }
 function sheetUI(){
  window.ao=window.ao||me;
- return `<div class="shb" onclick="if(event.target===this){sheet=0;draw()}"><div class="sh" role="dialog" aria-label="مهمة جديدة"><div class="row"><input id="ti" placeholder="المهمة" maxlength="120" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')add()"><button class="p" onclick="add()" aria-label="إضافة">+</button></div>${adm?`<div class="ch">${K.map(k=>`<button class="${window.ao==k?'on':''}" onclick="window.ao='${k}';draw()"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('')}</div>`:''}</div></div>`;
+ return `<div class="shb" onclick="if(event.target===this){sheet=0;draw()}"><div class="sh" role="dialog" aria-label="مهمة جديدة"><div class="row"><input id="ti" placeholder="المهمة" maxlength="120" style="flex:1;min-width:0" onkeydown="if(event.key==='Enter')add()"><button class="p" onclick="add()" aria-label="إضافة">+</button></div>${c9?`<input type="date" id="td" class="dt" aria-label="ميعاد التسليم" style="margin-top:8px">`:''}${adm?`<div class="ch">${K.map(k=>`<button class="${window.ao==k?'on':''}" onclick="window.ao='${k}';draw()"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('')}</div>`:''}</div></div>`;
 }
 function draw(){
  if(!st)return;
