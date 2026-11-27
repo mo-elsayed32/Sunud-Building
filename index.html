@@ -237,6 +237,13 @@ body:has(.fab) .nav{padding-left:90px}
 .mb[id^=m]{touch-action:pan-y;-webkit-touch-callout:none}.mb[id^=m] .mx{-webkit-user-select:none;user-select:none}
 #mmn{flex-wrap:wrap;justify-content:center;position:fixed;inset-inline:0;margin:auto;width:max-content;max-width:90vw;display:flex;gap:2px;background:var(--cd2,#18223c);border:1px solid #ffffff22;border-radius:14px;padding:4px;z-index:60;box-shadow:0 8px 24px #0008}#mmn button{background:transparent;border:0;color:var(--tx,#e8edf7);padding:10px 14px;font:inherit;border-radius:10px}#mmn button:active{background:#ffffff14}
 .rxr{display:flex;flex-basis:100%;justify-content:center}#mmn .rxr button{padding:6px 8px;font-size:20px}.tk{opacity:.5;font-size:11px}.tk.r{opacity:1;color:#0b3d91;font-weight:700}.ty{font-size:12px;color:var(--ac);margin-inline-start:8px}.rxs{display:flex;gap:4px;flex-wrap:wrap}.rxc{background:#00000030;border:0;border-radius:10px;padding:1px 6px;min-height:0;font-size:12px;color:inherit;box-shadow:none}.rxc.on{outline:1px solid var(--ac)}
+button{transition:background .15s,transform .22s cubic-bezier(.34,1.56,.64,1)}.nav button:active{transform:scale(.92)}.ck:active{transform:scale(.9)}
+.fi{animation:fi .2s ease-out}@keyframes fi{from{opacity:0;transform:translateY(6px)}}
+.sh.in{animation:su .24s cubic-bezier(.2,.8,.2,1)}@keyframes su{from{transform:translateY(36px);opacity:.5}}
+.ck.pp{animation:pp .35s cubic-bezier(.34,1.56,.64,1)}@keyframes pp{from{transform:scale(.78)}}
+.mb.nw{animation:bi .2s ease-out}@keyframes bi{from{opacity:0;transform:translateY(8px)}}
+.mb.gp{margin-top:-3px}.dv{align-self:center;font-size:11px;color:var(--mu);padding:2px 10px;background:#ffffff0c;border-radius:10px;margin:6px 0}
+@media(prefers-reduced-motion:reduce){.fi,.sh.in,.ck.pp,.mb.nw{animation:none}button{transition:none}}
 </style></head><body>
 <div id="lg" class="card">
  <h1>Sunud Building</h1>
@@ -255,7 +262,7 @@ const API='https://script.google.com/macros/s/AKfycbyqxqtRk6KDp-QaaLzoaes_rI3kXp
 const W={sayed:['محمّـد السيّد','#3b82f6'],refaat:['محمّـد رفعـت','#22c55e'],karim:['كريـم','#a855f7'],doaa:['دُعَـاء','#f8fafc'],ali:['علي','#facc15']},K=Object.keys(W);
 const $=i=>document.getElementById(i),E=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const nm=k=>W[k][0],co=k=>W[k][1];
-let c8=0,crr={},crx={},ced={},cty=[],edt=0,lty=0,ntl=null,nrl=0,rto=0,c6=0,c7=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
+let frs=new Set(),c8=0,crr={},crx={},ced={},cty=[],edt=0,lty=0,ntl=null,nrl=0,rto=0,c6=0,c7=0,cOK=null,msgs=[],cseen=null,con=[],crecv=0,csince=0,conv=null,rd={},rs={},rdn=0,tk=0,cv=0,csig='',stick=0,sndg=0,lk=[],opn={},me,code,st,adm,raw='',tab='h',viewB=0,sheet=0,rv=0,dec={},busy={},seen=null,tm;
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
@@ -307,7 +314,7 @@ async function pcall(a,x={}){
 function cmerge(j){
  const first=!cOK;cOK=true;if(j.v>=6)c6=1;if(j.v>=7)c7=1;if(j.rr){c8=1;crr=j.rr;crx=j.rx||{};ced=j.ed||{};cty=j.ty||[]}cseen=j.seen||{};con=j.on||[];crecv=Date.now();
  (j.del||[]).forEach(id=>{const i=msgs.findIndex(m=>m.id===id);if(i>=0){msgs.splice(i,1);cv++}});
- (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++}});
+ (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++;if(!first&&conv)frs.add(m.id)}});
  msgs.sort((a,b)=>a.id-b.id);
  csince=msgs.reduce((a,m)=>Math.max(a,m.id),csince);
  const sr=j.rd||{},hs=Object.keys(sr).length>0;
@@ -391,10 +398,11 @@ function chatUI(){
   return `<section class="card">`+row('all','الفريق كله',lastm('all'),'<i class="dot" style="background:var(--ac)"></i>','')+K.filter(k=>k!==me).map(k=>row(k,nm(k),lastSeen(k),`<i class="dot" style="background:${co(k)}"></i>`,pd(k))).join('')+`</section>`;
  }
  const hd=hidSet();const L=msgs.filter(m=>mid(m)===conv&&!hd.has(m.id));
- const bub=m=>{const mine=m.f===me,tm=new Date(m.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
+const dk=ts=>new Date(ts).toDateString();
+ const bub=(m,pv)=>{const mine=m.f===me,gp=!!pv&&pv.f===m.f&&m.ts-pv.ts<3e5&&dk(pv.ts)===dk(m.ts),dv=!pv||dk(pv.ts)!==dk(m.ts)?`<div class="dv">${new Date(m.ts).toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'})}</div>`:'',tm=new Date(m.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
   const o=m.re?msgs.find(x=>x.id===m.re):0,q=m.re?`<button class="mq" onclick="jm(${m.re})">${o?`<b>${nm(o.f)}</b> ${E(o.x.slice(0,60))}`:'رسالة محذوفة'}</button>`:'';
-  return `<div class="mb${mine?' me':''}" id="m${m.id}">${conv==='all'&&!mine?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}${q}<span class="mx">${E(mtx(m))}</span>${rxS(m)}<span class="mt">${tm}${c8&&ced[m.id]!==undefined?' معدّلة':''}${tkS(m)}${c6?` <button class="mx2" onclick="rpl(${m.id})" aria-label="رد">↩</button>`:''}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
- return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}${tyS()}</div><div class="ml" id="ml">${L.length?L.map(bub).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div>${rstrip()}<div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" oninput="tyP()" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
+  return dv+`<div class="mb${mine?' me':''}${gp?' gp':''}${frs.has(m.id)?' nw':''}" id="m${m.id}">${conv==='all'&&!mine&&!gp?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}${q}<span class="mx">${E(mtx(m))}</span>${rxS(m)}<span class="mt">${tm}${c8&&ced[m.id]!==undefined?' معدّلة':''}${tkS(m)}${c6?` <button class="mx2" onclick="rpl(${m.id})" aria-label="رد">↩</button>`:''}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
+ return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}${tyS()}</div><div class="ml" id="ml">${L.length?L.map((m,i)=>bub(m,L[i-1])).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div>${rstrip()}<div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" oninput="tyP()" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
 }
 function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
 /* actions: same backend calls and payloads as before */
@@ -406,7 +414,7 @@ async function add(){
  if(!j.ok){st.tasks=st.tasks.filter(x=>x!==tmp);sheet=1;draw();if($('ti'))$('ti').value=t}else draw()
 }
 async function act(f,id,...r){if(busy[id])return;busy[id]=1;draw();try{await f(id,...r)}finally{delete busy[id];draw()}}
-const dn=id=>{const t=st.tasks.find(x=>x.id===id);if(!t||busy[id])return;const p={s:t.s,d:t.d};if(t.s==='done'){t.s='open';delete t.d}else{t.s='done';t.d=Date.now()}busy[id]=1;draw();go('done',{id}).then(j=>{if(!j.ok){t.s=p.s;if(p.d===undefined)delete t.d;else t.d=p.d}}).finally(()=>{delete busy[id];draw()})},mv=(id,to)=>act(i=>go('move',{id:i,to}),id),rq=id=>act(i=>go('req',{id:i}),id);
+const dn=id=>{const t=st.tasks.find(x=>x.id===id);if(!t||busy[id])return;const p={s:t.s,d:t.d};if(t.s==='done'){t.s='open';delete t.d}else{t.s='done';t.d=Date.now()}busy[id]=1;window.__tg=id;draw();setTimeout(()=>{window.__tg=0},500);go('done',{id}).then(j=>{if(!j.ok){t.s=p.s;if(p.d===undefined)delete t.d;else t.d=p.d}}).finally(()=>{delete busy[id];draw()})},mv=(id,to)=>act(i=>go('move',{id:i,to}),id),rq=id=>act(i=>go('req',{id:i}),id);
 const rrx=(id,ok)=>{if(busy['r'+id])return;busy['r'+id]=1;draw();go('res',{id,ok}).finally(()=>{delete busy['r'+id];draw()})};
 const ul=k=>act(i=>go('unlock',{name:i}),k);
 const cfg=()=>go('cfg',{bpb:+$('c1').value,bpc:+$('c2').value});
@@ -418,7 +426,7 @@ async function fin(){
  const j=await go('reset',{dec});
  if(j.ok){rv=0;dec={};viewB=0;draw()}
 }
-const setTab=t=>{if(t!=='m'||tab==='m')closeC();tab=t;sheet=0;draw();scrollTo(0,0)};
+const setTab=t=>{if(t!=='m'||tab==='m')closeC();if(t!==tab)window.__tabNew=1;tab=t;sheet=0;draw();scrollTo(0,0)};
 const nav=d=>{viewB=Math.min(st.cur,Math.max(1,(viewB||st.cur)+d));if(viewB===st.cur)viewB=0;draw()};
 const openB=k=>{viewB=k===st.cur?0:k;tab='h';draw();scrollTo(0,0)};
 /* scene: floors come from real tasks of the viewed building */
@@ -460,7 +468,7 @@ function tasks(ts,ro){
   const own=t.owner===me,pend=st.reqs.some(r=>r.tid===t.id&&r.to===me),b=busy[t.id];
   let a='';
   if(!ro){
-   if(own)a=`<button class="ck${t.s==='done'?' on2':''}" ${b?'disabled':''} onclick="dn(${t.id})" aria-label="${t.s==='done'?'تراجع':'تمّت'}">${t.s==='done'?'✓':''}</button>`;
+   if(own)a=`<button class="ck${t.s==='done'?' on2':''}${window.__tg===t.id?' pp':''}" ${b?'disabled':''} onclick="dn(${t.id})" aria-label="${t.s==='done'?'تراجع':'تمّت'}">${t.s==='done'?'✓':''}</button>`;
    if(adm&&t.s==='open')a+=`<select ${b?'disabled':''} aria-label="نقل" onchange="mv(${t.id},this.value)"><option>⇄</option>${K.filter(k=>k!==t.owner).map(k=>`<option value="${k}">${nm(k)}</option>`).join('')}</select>`;
    if(t.dq)a=(adm?`<button class="p" ${b?'disabled':''} onclick="dres(${t.id},1)">مسح</button>`:'')+((own||adm)?`<button ${b?'disabled':''} onclick="${adm&&!own?`dres(${t.id},0)`:`dcan(${t.id})`}">${adm&&!own?'رفض':'إلغاء المسح'}</button>`:'');
    else if(adm)a+=`<button aria-label="مسح" ${b?'disabled':''} onclick="ddel(${t.id})"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>`;
@@ -537,11 +545,13 @@ function draw(){
  const v=tab==='n'?notifs():tab==='c'?city():tab==='s'?settings():tab==='u'?team():tab==='m'?chatUI():home();
  const IC={m:'<path d="M4 5h16v11H9l-5 4z"/>',u:'<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.8-6 6-6s6 2.5 6 6M16 5.5a3 3 0 0 1 0 5.6M18 14.5c2 .8 3 2.6 3 5.5"/>',h:'<path d="M5 20V8l7-4 7 4v12M9 20v-4h6v4M9 10h.01M15 10h.01M9 13h.01M15 13h.01"/>',c:'<path d="M3 20h18M5 20V10h5v10M10 20V5h5v15M15 20v-7h4v7"/>',s:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/>'};
  const nb=(k,l,b)=>`<button class="${tab===k?'a':''}" onclick="setTab('${k}')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg><span>${l}</span>${b?`<span class="bd">${b}</span>`:''}</button>`;
- $('v').innerHTML=v;
+ $('v').innerHTML=v;if(window.__tabNew){window.__tabNew=0;const e=$('v');e.classList.remove('fi');void e.offsetWidth;e.classList.add('fi')}
  $('fb').innerHTML=((adm?(tab==='h'||tab==='u'):tab==='h')&&viewB===0?`<button class="fab" onclick="sheet=1;draw();setTimeout(()=>$('ti')&&$('ti').focus(),30)" aria-label="مهمة جديدة">+</button>`:'')+(sheet?sheetUI():'')+`<div class="nav"><div>${nb('h','مهامي')}${nb('u','الفريق')}${cOK?nb('m','الدردشة',unrAll()):''}${nb('c','Building')}${adm?nb('s','الإعدادات',st.reqs.length+dqs().length+lk.length):''}</div></div>`;
+ {const e=sheet&&!window.__sh0?document.querySelector('.sh'):null;if(e)e.classList.add('in');window.__sh0=sheet}
  if(keep!==null&&$('ti')){$('ti').value=keep;$('ti').focus()}
  if(km!==null&&$('mi')){$('mi').value=km;if(kmF)$('mi').focus()}
  {const m2=$('ml');if(m2&&(stick||nearB)){m2.scrollTop=m2.scrollHeight;stick=0}}
+ if(frs.size)setTimeout(()=>frs.clear(),350);
  seen=new Set(st.tasks.filter(t=>t.s==='done').map(t=>t.id));
 }
 try{const m=sessionStorage.getItem('lm');if(m){sessionStorage.removeItem('lm');$('le').textContent=m}}catch(e){}
