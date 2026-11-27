@@ -227,7 +227,7 @@ body:has(.fab) .nav{padding-left:90px}
 .ml{display:flex;flex-direction:column;gap:6px;height:calc(100dvh - 340px);min-height:180px;overflow-y:auto;padding:4px 2px;margin-bottom:10px}
 .mb{max-width:80%;align-self:flex-end;background:#ffffff12;border-radius:18px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
 .mb.me{align-self:flex-start;background:var(--ac);color:#1a1405}
-.mw{font-size:11px;font-weight:700}.mx{font-size:15px;white-space:pre-wrap;word-break:break-word}.mt{font-size:10px;opacity:.6}
+.mw{font-size:11px;font-weight:700}.mx{font-size:15px;white-space:pre-wrap;word-break:break-word}.mt{font-size:10px;opacity:.6}.mb.pd2{opacity:.55}
 .mx2{background:none;border:0;color:inherit;padding:0 4px;min-height:0;font-size:11px;opacity:.7;box-shadow:none}
 .mq{display:block;width:100%;text-align:start;background:#00000024;border:0;border-inline-start:3px solid var(--ac);border-radius:8px;padding:2px 8px;min-height:0;font-size:12px;opacity:.85;color:inherit;margin-bottom:2px;box-shadow:none}
 .rp{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#ffffff0d;border-inline-start:3px solid var(--ac);border-radius:10px;padding:4px 10px;font-size:12px;margin-bottom:6px}.rp span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -280,6 +280,7 @@ async function call(a,x={}){
   const j=await r.json();
   if(!j.ok){$('sy').textContent='!';if(badCode(j)&&!$('mn').hidden)authLost(j.err);return j}
   adm=j.role==='admin';try{localStorage.setItem('sn_'+me,JSON.stringify({r:j.role,st:j.st}))}catch(e){}
+  if(a==='get'&&j.st&&st&&st.tasks){let bs=0;for(const k in busy){bs=1;break}if(bs)j.st.tasks.forEach(t=>{if(busy[t.id]){const o=st.tasks.find(x=>x.id===t.id);if(o){t.s=o.s;if(o.d===undefined)delete t.d;else t.d=o.d}}})}
   lk=adm&&Array.isArray(j.locked)?j.locked.filter(k=>W[k]):[];const s=JSON.stringify([j.st,lk]);if(s!==raw){raw=s;st=j.st;draw()}
   $('sy').textContent='●';return j;
  }catch(e){$('sy').textContent='✕';return{ok:false,err:'مفيش اتصال'}}
@@ -325,7 +326,7 @@ async function pcall(a,x={}){
  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});return await r.json()}catch(e){return null}
 }
 function cmerge(j){
- const first=!cOK;cOK=true;sv=j.v||0;if(j.v>=6)c6=1;if(j.v>=7)c7=1;if(j.v>=8)c9=1;if(j.rr){c8=1;crr=j.rr;crx=j.rx||{};ced=j.ed||{};cty=j.ty||[]}cseen=j.seen||{};con=j.on||[];crecv=Date.now();
+ const first=!cOK;cOK=true;sv=j.v||0;if(j.v>=6)c6=1;if(j.v>=7)c7=1;if(j.v>=8)c9=1;if(j.rr){c8=1;crr=j.rr;crx=j.rx||{};ced=j.ed||{};cty=j.ty||[];for(const id in prx){const o=crx[id]||(crx[id]={});if(prx[id])o[me]=prx[id];else delete o[me];if(!Object.keys(o).length)delete crx[id]}}cseen=j.seen||{};con=j.on||[];crecv=Date.now();
  (j.del||[]).forEach(id=>{const i=msgs.findIndex(m=>m.id===id);if(i>=0){msgs.splice(i,1);cv++}});
  (j.msgs||[]).forEach(m=>{if(!msgs.some(x=>x.id===m.id)){msgs.push(m);cv++;if(!first&&conv)frs.add(m.id)}});
  msgs.sort((a,b)=>a.id-b.id);
@@ -354,10 +355,17 @@ async function sendRd(c){
 }
 function closeC(){const c=conv;conv=null;rto=0;edt=0;sendRd(c)}
 function openC(c){conv=c;rto=0;edt=0;rd[c]=Math.max(rd[c]||0,cmax(c));svrd();stick=1;sendRd(c);draw();ping()}
+let pends=[],pn=0;
 async function msend(){
- const el=$('mi'),t=el?el.value.trim():'';if(!t||!conv||sndg)return;
- sndg=1;const j=edt&&c8?await pcall('medit',{id:edt,text:t}):await pcall('msend',{to:conv,text:t,...(rto&&c6?{re:rto}:{})});sndg=0;
- if(j&&j.ok){rto=0;edt=0;if($('mi'))$('mi').value='';stick=1;cmerge(j);rd[conv]=cmax(conv);svrd();draw()}else toast((j&&j.err)||'مفيش اتصال');
+ const el=$('mi'),t=el?el.value.trim():'';if(!t||!conv)return;
+ if(edt&&c8){if(sndg)return;sndg=1;const j=await pcall('medit',{id:edt,text:t});sndg=0;
+  if(j&&j.ok){rto=0;edt=0;if($('mi'))$('mi').value='';cmerge(j);draw()}else toast((j&&j.err)||'مفيش اتصال');return}
+ const re=rto&&c6?rto:0,p={id:--pn,t:conv,x:t,re,ts:Date.now()};
+ pends.push(p);rto=0;if(el)el.value='';stick=1;draw();
+ const j=await pcall('msend',{to:conv,text:t,...(re?{re}:{})});
+ pends=pends.filter(x=>x!==p);
+ if(j&&j.ok){stick=1;cmerge(j);rd[conv]=cmax(conv);svrd();draw()}
+ else{rto=re;toast((j&&j.err)||'مفيش اتصال');draw();const e2=$('mi');if(e2&&!e2.value)e2.value=t}
 }
 async function mdel(id){
  if(!confirm('مسح الرسالة؟'))return;
@@ -370,7 +378,10 @@ function rstrip(){
 }
 function rpl(id){rto=id;edt=0;draw();if(id&&$('mi'))$('mi').focus()}
 const RXS=['👍','❤️','😂','😮','😢','🙏'],mtx=m=>ced[m.id]!==undefined?ced[m.id]:m.x;
-async function mrx(id,e){mclose();const cur=(crx[id]||{})[me];const j=await pcall('mrx',{id,e:cur===e?'':e});if(j&&j.ok){cmerge(j);draw()}else toast((j&&j.err)||'مفيش اتصال')}
+const prx={};
+async function mrx(id,e){mclose();const cur=(crx[id]||{})[me],v=cur===e?'':e;prx[id]=v;{const o=crx[id]||(crx[id]={});if(v)o[me]=v;else delete o[me];if(!Object.keys(o).length)delete crx[id]}draw();
+ const j=await pcall('mrx',{id,e:v});delete prx[id];
+ if(j&&j.ok){cmerge(j);draw()}else{{const o=crx[id]||(crx[id]={});if(cur)o[me]=cur;else delete o[me];if(!Object.keys(o).length)delete crx[id]}draw();toast((j&&j.err)||'مفيش اتصال')}}
 function medit(id){mclose();const m=msgs.find(x=>x.id===id);if(!m)return;edt=id;rto=0;draw();const i=$('mi');if(i){i.value=mtx(m);i.focus()}}
 function tyP(){if(!c8||!conv||Date.now()-lty<3000)return;const i=$('mi');if(!i||!i.value.trim())return;lty=Date.now();pcall('ty',{to:conv}).then(j=>{if(j&&j.ok)cmerge(j)})}
 function tyS(){if(!c8||!conv)return'';const a=cty.filter(x=>conv==='all'?x[1]==='all':(x[0]===conv&&x[1]===me)).map(x=>nm(x[0]));return a.length?`<span class="ty">${a.join('، ')} بيكتب...</span>`:''}
@@ -416,11 +427,12 @@ function chatUI(){
  }
  const hd=hidSet();const L=msgs.filter(m=>mid(m)===conv&&!hd.has(m.id));
 const dk=ts=>new Date(ts).toDateString();
+ const pbub=p=>{const o=p.re?msgs.find(x=>x.id===p.re):0,q=p.re?`<span class="mq">${o?`<b>${nm(o.f)}</b> ${E(o.x.slice(0,60))}`:'رسالة محذوفة'}</span>`:'',tm=new Date(p.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});return `<div class="mb me pd2">${q}<span class="mx">${E(p.x)}</span><span class="mt">${tm} …</span></div>`};
  const bub=(m,pv)=>{const mine=m.f===me,gp=!!pv&&pv.f===m.f&&!pv.k&&!m.k&&m.ts-pv.ts<3e5&&dk(pv.ts)===dk(m.ts),dv=!pv||dk(pv.ts)!==dk(m.ts)?`<div class="dv">${new Date(m.ts).toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'})}</div>`:'',tm=new Date(m.ts).toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'});
   if(m.k==='sys')return dv+`<div class="ms">${E(m.x)}</div>`;
   const o=m.re?msgs.find(x=>x.id===m.re):0,q=m.re?`<button class="mq" onclick="jm(${m.re})">${o?`<b>${nm(o.f)}</b> ${E(o.x.slice(0,60))}`:'رسالة محذوفة'}</button>`:'';
   return dv+`<div class="mb${mine?' me':''}${gp?' gp':''}${frs.has(m.id)?' nw':''}" id="m${m.id}">${conv==='all'&&!mine&&!gp?`<span class="mw" style="color:${co(m.f)}">${nm(m.f)}</span>`:''}${q}<span class="mx">${E(mtx(m))}</span>${rxS(m)}<span class="mt">${tm}${c8&&ced[m.id]!==undefined?' معدّلة':''}${tkS(m)}${c6?` <button class="mx2" onclick="rpl(${m.id})" aria-label="رد">↩</button>`:''}${adm?` <button class="mx2" onclick="mdel(${m.id})" aria-label="مسح">✕</button>`:''}</span></div>`};
- return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}${tyS()}</div><div class="ml" id="ml">${L.length?L.map((m,i)=>bub(m,L[i-1])).join(''):'<div class="empty">ابدأ المحادثة</div>'}</div>${rstrip()}<div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" oninput="tyP()" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
+ return `<section class="card cv"><div class="ch3"><button onclick="closeC();draw()" aria-label="رجوع">›</button><b>${conv==='all'?'الفريق كله':nm(conv)}</b>${conv==='all'?'':pd(conv)}${tyS()}</div><div class="ml" id="ml">${L.length?L.map((m,i)=>bub(m,L[i-1])).join(''):(pends.some(p=>p.t===conv)?'':'<div class="empty">ابدأ المحادثة</div>')}${pends.filter(p=>p.t===conv).map(pbub).join('')}</div>${rstrip()}<div class="row"><input id="mi" maxlength="500" placeholder="رسالة" style="flex:1;min-width:0" oninput="tyP()" onkeydown="if(event.key==='Enter')msend()"><button class="p" onclick="msend()" aria-label="إرسال">↑</button></div></section>`;
 }
 function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
 /* actions: same backend calls and payloads as before */
