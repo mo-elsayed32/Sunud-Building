@@ -251,7 +251,7 @@ button{transition:background .15s,transform .22s cubic-bezier(.34,1.56,.64,1)}.n
 </style></head><body>
 <div id="lg" class="card">
  <h1>Sunud Building</h1>
- <div class="nm" id="names"></div>
+ <div class="nm" id="names" hidden></div>
  <input id="code" type="password" placeholder="الرمز" autocomplete="off" style="width:100%" onkeydown="if(event.key==='Enter')login()">
  <button class="p go" onclick="login()">دخول</button>
  <p id="le" class="mu" role="alert"></p>
@@ -286,8 +286,17 @@ async function call(a,x={}){
 }
 const go=async(a,x)=>{const j=await call(a,x);if(!j.ok)toast(j.err||'حصل خطأ');return j};
 async function login(){
- if(!me)return $('le').textContent='اختار اسمك';
  code=$('code').value.trim();$('le').textContent='';
+ if(!me){
+  if(!code)return $('le').textContent='اكتب الرمز';
+  let j0;
+  try{const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'get',who:'',code})});j0=await r.json()}catch(e){return $('le').textContent='مفيش اتصال'}
+  if(!j0.ok){
+   if(/الاسم أو الرمز غلط/.test(j0.err||'')){$('names').hidden=0;return $('le').textContent='اختار اسمك الأول'}
+   return $('le').textContent=j0.err||'حصل خطأ';
+  }
+  me=j0.who;pick(me);
+ }
  const j=await call('get');
  if(!j.ok&&!(snapShown&&j.err==='مفيش اتصال')){if(snapShown){snapShown=0;$('lg').hidden=0;$('mn').hidden=1}return $('le').textContent=j.err||'حصل خطأ'}
  try{localStorage.setItem('sb',JSON.stringify([me,code]))}catch(e){}
