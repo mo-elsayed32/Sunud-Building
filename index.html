@@ -259,13 +259,16 @@ let c8=0,crr={},crx={},ced={},cty=[],edt=0,lty=0,ntl=null,nrl=0,rto=0,c6=0,c7=0,
 $('names').innerHTML=K.map(k=>`<button id="n_${k}" onclick="pick('${k}')"><i class="dot" style="background:${co(k)}"></i>${nm(k)}</button>`).join('');
 function pick(k){me=k;K.forEach(x=>$('n_'+x).classList.toggle('on',x==k));$('code').focus()}
 function toast(m){clearTimeout(tm);$('tsw').innerHTML=`<div id="ts" role="alert">${E(m)}</div>`;tm=setTimeout(()=>$('tsw').innerHTML='',3500)}
+let pI1=0,pI2=0,snapShown=0;
+function authLost(m){clearInterval(pI1);clearInterval(pI2);try{localStorage.removeItem('sb');localStorage.removeItem('sn_'+me);sessionStorage.setItem('lm',m||'')}catch(e){}location.reload()}
+const badCode=j=>j&&!j.ok&&/الاسم أو الرمز غلط/.test(j.err||'');
 async function call(a,x={}){
  try{
   $('sy').textContent='…';
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});
   const j=await r.json();
-  if(!j.ok){$('sy').textContent='!';return j}
-  adm=j.role==='admin';
+  if(!j.ok){$('sy').textContent='!';if(badCode(j)&&!$('mn').hidden)authLost(j.err);return j}
+  adm=j.role==='admin';try{localStorage.setItem('sn_'+me,JSON.stringify({r:j.role,st:j.st}))}catch(e){}
   lk=adm&&Array.isArray(j.locked)?j.locked.filter(k=>W[k]):[];const s=JSON.stringify([j.st,lk]);if(s!==raw){raw=s;st=j.st;draw()}
   $('sy').textContent='●';return j;
  }catch(e){$('sy').textContent='✕';return{ok:false,err:'مفيش اتصال'}}
@@ -275,12 +278,12 @@ async function login(){
  if(!me)return $('le').textContent='اختار اسمك';
  code=$('code').value.trim();$('le').textContent='';
  const j=await call('get');
- if(!j.ok)return $('le').textContent=j.err||'حصل خطأ';
+ if(!j.ok&&!(snapShown&&j.err==='مفيش اتصال')){if(snapShown){snapShown=0;$('lg').hidden=0;$('mn').hidden=1}return $('le').textContent=j.err||'حصل خطأ'}
  try{localStorage.setItem('sb',JSON.stringify([me,code]))}catch(e){}
  $('lg').hidden=1;$('mn').hidden=0;
  try{const z=localStorage.getItem('rd_'+me);rd=z?JSON.parse(z):{};rdn=z?1:0}catch(e){rd={}}
- setInterval(()=>{if(!document.hidden)call('get')},15000);
- setInterval(()=>{tk++;if(conv||tk%9===0)ping()},5000);ping();
+pI1=setInterval(()=>{if(!document.hidden)call('get')},15000);
+ pI2=setInterval(()=>{tk++;if(conv||tk%9===0)ping()},5000);ping();
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){call('get');ping()}});
 }
 
@@ -310,7 +313,7 @@ function cmerge(j){
  const sr=j.rd||{},hs=Object.keys(sr).length>0;
  Object.keys(sr).forEach(c=>{if(sr[c]>(rd[c]||0)){rd[c]=sr[c];rs[c]=Math.max(rs[c]||0,sr[c])}});
  if(first&&!rdn&&!hs){['all',...K.filter(k=>k!==me)].forEach(c=>{rd[c]=cmax(c)});svrd()}
- if(conv&&cmax(conv)>(rd[conv]||0)){rd[conv]=cmax(conv);svrd()}
+ if(conv&&cmax(conv)>(rd[conv]||0)){rd[conv]=cmax(conv);svrd();sendRd(conv)}
  const g=con.join()+'|'+cv+'|'+unrAll()+'|'+(conv?conv:Math.floor(Date.now()/60000))+'|'+(c8?JSON.stringify([crr,crx,ced,cty]):'');
  if(g!==csig){csig=g;draw()}
 }
@@ -318,7 +321,7 @@ async function ping(){
  if(!me||!code||!st||document.hidden||cOK===false)return;
  const j=await pcall('ping',{since:csince});
  if(!j)return;
- if(!j.ok){if(/معروف/.test(j.err||''))cOK=false;return}
+ if(!j.ok){if(badCode(j)&&!$('mn').hidden)authLost(j.err);if(/معروف/.test(j.err||''))cOK=false;return}
  cmerge(j);
 }
 async function sendRd(c){
@@ -397,10 +400,13 @@ function out(){try{localStorage.removeItem('sb')}catch(e){}location.reload()}
 /* actions: same backend calls and payloads as before */
 async function add(){
  const t=$('ti').value.trim();if(!t)return;
- const j=await go('add',{title:t,owner:adm?(window.ao||me):me});if(j.ok){sheet=0;draw()}
+ const ow=adm?(window.ao||me):me,tmp={id:-Date.now(),title:t.slice(0,120),owner:ow,by:adm?'admin':'self',s:'open',b:st.cur};
+ st.tasks.push(tmp);busy[tmp.id]=1;sheet=0;draw();
+ const j=await go('add',{title:t,owner:ow});delete busy[tmp.id];
+ if(!j.ok){st.tasks=st.tasks.filter(x=>x!==tmp);sheet=1;draw();if($('ti'))$('ti').value=t}else draw()
 }
 async function act(f,id,...r){if(busy[id])return;busy[id]=1;draw();try{await f(id,...r)}finally{delete busy[id];draw()}}
-const dn=id=>act(i=>go('done',{id:i}),id),mv=(id,to)=>act(i=>go('move',{id:i,to}),id),rq=id=>act(i=>go('req',{id:i}),id);
+const dn=id=>{const t=st.tasks.find(x=>x.id===id);if(!t||busy[id])return;const p={s:t.s,d:t.d};if(t.s==='done'){t.s='open';delete t.d}else{t.s='done';t.d=Date.now()}busy[id]=1;draw();go('done',{id}).then(j=>{if(!j.ok){t.s=p.s;if(p.d===undefined)delete t.d;else t.d=p.d}}).finally(()=>{delete busy[id];draw()})},mv=(id,to)=>act(i=>go('move',{id:i,to}),id),rq=id=>act(i=>go('req',{id:i}),id);
 const rrx=(id,ok)=>{if(busy['r'+id])return;busy['r'+id]=1;draw();go('res',{id,ok}).finally(()=>{delete busy['r'+id];draw()})};
 const ul=k=>act(i=>go('unlock',{name:i}),k);
 const cfg=()=>go('cfg',{bpb:+$('c1').value,bpc:+$('c2').value});
@@ -538,6 +544,9 @@ function draw(){
  {const m2=$('ml');if(m2&&(stick||nearB)){m2.scrollTop=m2.scrollHeight;stick=0}}
  seen=new Set(st.tasks.filter(t=>t.s==='done').map(t=>t.id));
 }
-try{const s=JSON.parse(localStorage.getItem('sb'));if(s){pick(s[0]);$('code').value=s[1];login()}}catch(e){}
+try{const m=sessionStorage.getItem('lm');if(m){sessionStorage.removeItem('lm');$('le').textContent=m}}catch(e){}
+try{const s=JSON.parse(localStorage.getItem('sb'));if(s){pick(s[0]);$('code').value=s[1];
+ try{const o=JSON.parse(localStorage.getItem('sn_'+s[0]));if(o&&o.st&&Array.isArray(o.st.tasks)){st=o.st;adm=o.r==='admin';snapShown=1;$('lg').hidden=1;$('mn').hidden=0;draw()}}catch(e){snapShown=0}
+ login()}}catch(e){}
 </script><script>if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))</script>
 </body></html>
