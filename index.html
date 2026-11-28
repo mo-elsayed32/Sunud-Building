@@ -16,7 +16,8 @@ input,select,button{font:inherit;color:var(--tx);background:#0e1730;border:1px s
 button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 button.p,.on{background:var(--ac);color:#1a1405;border-color:var(--ac);font-weight:700}
 button:disabled{opacity:.4;cursor:not-allowed}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.sp{justify-content:space-between}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hf{display:flex;gap:8px;margin:0 0 10px}.hf button{min-height:38px;padding:4px 14px;border-radius:999px;font-size:14px}.sp{justify-content:space-between}
 .mu{color:var(--mu);font-size:13px}
 .dot{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none;border:1px solid #ffffff66}
 /* login */
@@ -357,6 +358,7 @@ async function sendRd(c){
 function closeC(){const c=conv;conv=null;rto=0;edt=0;sendRd(c)}
 function openC(c){conv=c;rto=0;edt=0;rd[c]=Math.max(rd[c]||0,cmax(c));svrd();stick=1;sendRd(c);draw();ping()}
 let pends=[],pn=0;
+let hf='mine',hq='';
 async function msend(){
  const el=$('mi'),t=el?el.value.trim():'';if(!t||!conv)return;
  if(edt&&c8){if(sndg)return;sndg=1;const j=await pcall('medit',{id:edt,text:t});sndg=0;
@@ -527,15 +529,24 @@ function scn(ts,vb,live,o){
   <div class="cap"><div><div class="mu">مبنى ${vb}${live?'':' · مقفول'}</div><div class="big">${state}</div><div class="mu">بلوك ${Math.floor(ic/c.bpb)+1}/${c.bpc} · مبنى ${ic%c.bpb+1}/${c.bpb}${cities?' · مدينة '+(cities+1):''}</div></div>
   <div class="nv"><button onclick="nav(-1)" ${vb<=1?'disabled':''} aria-label="السابق">›</button><button onclick="nav(1)" ${live?'disabled':''} aria-label="التالي">‹</button></div></div></section>`;
 }
+function hro(){const vb=viewB||st.cur;return vb!==st.cur}
+function hlist(){
+ const vb=viewB||st.cur,ts=byB(vb);
+ const base=hf==='all'?ts:ts.filter(t=>t.owner===me);
+ if(!hq)return base;
+ const q=hq.toLowerCase();
+ return base.filter(t=>String(t.title).toLowerCase().includes(q)||nm(t.owner).toLowerCase().includes(q)||t.owner.toLowerCase().includes(q));
+}
+function hset(f){hf=f;draw()}
 function home(){
  const cur=st.cur,vb=viewB||cur,ts=byB(vb),live=vb===cur,o=ts.filter(t=>t.s==='open').length;
- const m=own1(ts,me),mine=ts.filter(t=>t.owner===me);
+ const m=own1(ts,me);
  const dbn=()=>{if(!c9||!live)return'';const z=d0(),a=ts.filter(t=>t.owner===me&&t.s==='open'&&t.due&&t.due<z+864e5);if(!a.length)return'';
   const ov=a.filter(t=>t.due<z).length,td=a.length-ov,p=[];if(ov)p.push(`<b class="du o">متأخر ${ov}</b>`);if(td)p.push(`<b class="du t">النهارده ${td}</b>`);
   return `<section class="card db">${p.join(' · ')}</section>`};
  return `<div class="home"><div class="l">${scn(ts,vb,live,o)}
   ${dbn()}<section class="card mine"><div class="row sp"><span class="row" style="gap:8px"><i class="dot" style="background:${co(me)}"></i><b>مهامي</b></span><span class="v">${m.a.length?m.dn+'/'+m.a.length:'—'}</span></div><div class="bar"><i style="width:${m.p}%;background:${co(me)}"></i></div></section></div>
-  <div class="r"><section class="flat">${tasks(mine,!live)}</section></div></div>`;
+  <div class="r"><div class="hf"><button class="${hf==='mine'?'p':''}" onclick="hset('mine')">مهامي</button><button class="${hf==='all'?'p':''}" onclick="hset('all')">الكل</button></div><section class="flat">${tasks(hlist(),hro())}</section></div></div>`;
 }
 const tg=k=>{opn[k]=!opn[k];draw()};
 function team(){
