@@ -279,6 +279,7 @@ async function call(a,x={}){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,who:me,code,...x})});
   const j=await r.json();
   if(!j.ok){$('sy').textContent='!';if(badCode(j)&&!$('mn').hidden)authLost(j.err);return j}
+  if(!j.st){$('sy').textContent='●';return j}
   adm=j.role==='admin';try{localStorage.setItem('sn_'+me,JSON.stringify({r:j.role,st:j.st}))}catch(e){}
   if(a==='get'&&j.st&&st&&st.tasks){let bs=0;for(const k in busy){bs=1;break}if(bs)j.st.tasks.forEach(t=>{if(busy[t.id]){const o=st.tasks.find(x=>x.id===t.id);if(o){t.s=o.s;if(o.d===undefined)delete t.d;else t.d=o.d}}})}
   lk=adm&&Array.isArray(j.locked)?j.locked.filter(k=>W[k]):[];const s=JSON.stringify([j.st,lk]);if(s!==raw){raw=s;st=j.st;draw()}
