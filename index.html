@@ -304,8 +304,8 @@ async function login(){
  try{localStorage.setItem('sb',JSON.stringify([me,code]))}catch(e){}
  $('lg').hidden=1;$('mn').hidden=0;
  try{const z=localStorage.getItem('rd_'+me);rd=z?JSON.parse(z):{};rdn=z?1:0}catch(e){rd={}}
-pI1=setInterval(()=>{if(!document.hidden)call('get')},15000);
- pI2=setInterval(()=>{tk++;if(conv||tk%9===0)ping()},5000);ping();
+pI1=0;
+ pI2=setInterval(()=>{tk++;if(document.hidden)return;if(conv){ping();if(tk%12===0)call('get')}else{if(tk%12===0)ping();if(tk%6===0)call('get')}},5000);ping();
  document.addEventListener('visibilitychange',()=>{if(!document.hidden){call('get');ping()}});
 }
 
